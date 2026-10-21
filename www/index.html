@@ -166,6 +166,34 @@ nav button .tn{font-size:1.05rem;line-height:1.3}nav button small{font-size:.62r
 p,.note,small{unicode-bidi:plaintext}
 .ltr{display:flex;flex-direction:column;gap:18px}
 .ltr .gcard,.ltr .plan{text-align:left}
+/* two paths */
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:6px}
+.trk{border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.trk .ar{font-size:1.2rem;line-height:1.4}.trk small{font-size:.7rem;font-weight:700;color:var(--muted)}
+.trk.on{background:var(--leaf);color:#fff}.trk.on small{color:#fff;opacity:.85}
+/* learn-to-read lessons */
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.rstep{background:var(--surface);border:2px solid var(--line);border-top:6px solid var(--c);border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.rstep.done{border-color:var(--leaf)}
+.rstep .rl{font-size:2.2rem;line-height:1.3}.rstep .rw{font-size:1.05rem;color:var(--muted);line-height:1.5}
+.newl{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.nl{display:flex;flex-direction:column;align-items:center;background:var(--bg);border-radius:20px;padding:6px 16px}
+.big2{font-size:5rem;line-height:1.3}.shp{font-size:1.6rem;color:var(--muted);word-spacing:.4em}
+.wcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.wcard{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.wcard .ar{font-size:2.3rem;line-height:1.5}
+.em{font-size:2.6rem;line-height:1.2;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.em.huge{font-size:5rem}
+.sents{display:flex;flex-direction:column;gap:8px}
+.sent{background:color-mix(in srgb,var(--sun) 25%,var(--surface));border-radius:18px;padding:10px 16px;font-size:2rem;line-height:1.8;text-align:center}
+.rword{font-size:4rem;line-height:1.6}
+.choices.pics button{aspect-ratio:1.2}.choices.pics .em{font-size:3.4rem}
+.choices.rwords button{aspect-ratio:auto;padding:14px 6px;font-size:2.2rem;line-height:1.5}
+.built{min-height:1.6em;font-size:3.4rem;line-height:1.5;color:var(--leaf);border-bottom:3px dashed var(--line);min-width:60%;text-align:center}
+.tiles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.ltile{width:64px;height:64px;border-radius:18px;background:var(--bg);border:3px solid var(--line);font-size:2.2rem}
+.ltile.good{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 22%,var(--surface));opacity:.55}
+.ltile.bad{border-color:var(--coral);animation:shake .3s}
 /* plans */
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .plan{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
@@ -488,9 +516,18 @@ function finishLevel(k){
 }
 
 /* ================= LEARN ================= */
-function learn(){
+const trackSwitch=()=>`<div class="tracks"><button class="trk ${S.track!=="read"?"on":""}" data-trk="quran"><span class="ar">📖 طَرِيقُ القُرْآن</span><small>Qurʾān path</small></button><button class="trk ${S.track==="read"?"on":""}" data-trk="read"><span class="ar">✏️ تَعَلَّمِ القِرَاءَة</span><small>Learn to read</small></button></div>`;
+function learn(tr){
+  if(typeof tr==="string"){S.track=tr;save()}
   top0();const kd=kid();
-  view.innerHTML=`<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${GAMES.map(g=>`<button class="chip" data-g="${g.id}" style="background:${g.col}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}${!g.free&&!S.member?" 🔒":""}</span><small>${g.name}</small></button>`).join("")}</div></div>
+  if(S.track==="read"){
+    view.innerHTML=`${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${Object.entries(RGAMES).map(([id,g],j)=>`<button class="chip" data-rg="${id}" style="background:${COLS[j%4]}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}</span><small>${g.name}</small></button>`).join("")}</div></div>${readPath()}`;
+    view.querySelectorAll("[data-trk]").forEach(b=>b.onclick=()=>learn(b.dataset.trk));
+    view.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>rGame(b.dataset.rg,0,0));
+    view.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>readLesson(+b.dataset.r));
+    return;
+  }
+  view.innerHTML=`${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${GAMES.map(g=>`<button class="chip" data-g="${g.id}" style="background:${g.col}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}${!g.free&&!S.member?" 🔒":""}</span><small>${g.name}</small></button>`).join("")}</div></div>
   <div>${bi("طَرِيقُ الْقِرَاءَة",escH(kd.name)+"'s reading path","title")}
   <p class="ar pa">${AN(kd.done.length)} مِنْ ${AN(UNITS.length)} مُسْتَوًى</p>
   <div class="bar"><span style="width:${Math.round(kd.done.length/UNITS.length*100)}%"></span></div></div>
@@ -500,6 +537,7 @@ function learn(){
     ${kd.done.includes(u.id)?'<span class="lock free ar">✓ تَمّ</span>':unlocked(u)?(u.free?'<span class="lock free ar">مَجَّانِي</span>':""):'<span class="lock ar">🔒</span>'}</button>`).join("")}</div>`;
   view.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>openUnit(+b.dataset.u,0));
   view.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>startGame(b.dataset.g));
+  view.querySelectorAll("[data-trk]").forEach(b=>b.onclick=()=>learn(b.dataset.trk));
 }
 function openUnit(k,i){
   const u=UNITS[k];top0();
@@ -645,8 +683,12 @@ function startGame(id){
 function play(){
   top0();
   view.innerHTML=`<div>${bi("الْأَلْعَاب","Games","title")}<p>Every win earns a star.</p></div>
+  ${bi("✏️ أَلْعَابُ القِرَاءَة","Reading games","h")}
+  <div class="games">${Object.entries(RGAMES).map(([id,g],j)=>`<button class="gcard" data-rg="${id}"><span class="gic ar" style="background:${COLS[j%4]}">${g.ic}</span>${bi(g.a,g.name,"h")}<p>Uses the words from the lessons your child has finished.</p></button>`).join("")}</div>
+  ${bi("📖 أَلْعَابُ القُرْآن","Qurʾān games","h")}
   <div class="games">${GAMES.map(g=>`<button class="gcard" data-g="${g.id}"><span class="gic ar" style="background:${g.col}">${g.ic}</span>${bi(g.a+(g.free||S.member?"":" 🔒"),g.name,"h")}<p>${g.sub}</p></button>`).join("")}</div>`;
   view.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>startGame(b.dataset.g));
+  view.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>rGame(b.dataset.rg,0,0));
 }
 function quiz(id,score,prompt,opts,isRight,next,cls=""){
   const g=G(id);
@@ -771,6 +813,149 @@ function bounce(){
     else{b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400)}});
 }
 
+
+/* ================= LEARN TO READ (step-by-step method) =================
+   One new letter per lesson. Every word and sentence uses only letters
+   the child has already learned (checked by READ_CHECK below). */
+const RL=[
+ {l:"دارو",w:[["دَار","🏠"],["وَرْد","🌹"],["دُود","🐛"],["دَوْر",""]]},
+ {l:"ز",w:[["زَارَ",""],["زِرّ","🔘"],["زَادَ",""]]},
+ {l:"ب",w:[["بَاب","🚪"],["دُبّ","🐻"],["بَدْر","🌕"],["بَرْد",""]]},
+ {l:"ت",w:[["تُوت","🫐"],["تُرَاب",""],["بَاتَ",""]]},
+ {l:"ن",w:[["نَار","🔥"],["نُور","💡"],["بِنْت","👧"],["بُنّ","☕"]]},
+ {l:"ي",w:[["بَيْت","🏡"],["يَد","✋"],["زَيْتُون","🫒"],["تِين",""],["زَيْت",""]]},
+ {l:"م",w:[["مَوْز","🍌"],["تَمْر","🌴"],["نَمِر","🐯"]]},
+ {l:"س",w:[["سِنّ","🦷"],["مِسْمَار","🔩"],["سُور","🧱"],["سَمِير",""]]},
+ {l:"ل",w:[["لَيْمُون","🍋"],["لَبَن","🥛"],["لَيْل","🌃"],["بُلْبُل","🐦"],["وَلَد","👦"]]},
+ {l:"ك",w:[["كَلْب","🐕"],["كِتَاب","📖"],["سَمَك","🐟"],["مَلِك","🤴"],["دِيك","🐓"]]},
+ {l:"ة",w:[["وَرْدَة","🌷"],["نَمْلَة","🐜"],["سَيَّارَة","🚗"],["كُرَة","⚽"],["سَمَكَة","🐠"]]},
+ {l:"ش",w:[["شَمْس","☀️"],["مِشْمِش","🍑"],["شَاي","🍵"],["رِيشَة","🪶"],["شُبَّاك","🪟"]]},
+ {l:"ف",w:[["فِيل","🐘"],["فَم","👄"],["فَرَاشَة","🦋"],["كَفّ","🖐️"],["فُول",""]]},
+ {l:"ق",w:[["قَمَر","🌙"],["قَلَم","✏️"],["قَارِب","⛵"],["وَرَقَة","🍃"],["بُرْتُقَال","🍊"]]},
+ {l:"ج",w:[["جَمَل","🐪"],["جَبَل","⛰️"],["دَجَاجَة","🐔"],["تَاج","👑"],["جَزَر","🥕"]]},
+ {l:"ح",w:[["حَلِيب","🍼"],["بَحْر","🌊"],["حُوت","🐋"],["تُفَّاح","🍎"],["حَمَامَة","🕊️"]]},
+ {l:"خ",w:[["خُبْز","🍞"],["خَيْمَة","⛺"],["خَرُوف","🐑"],["خَوْخ",""]]},
+ {l:"ع",w:[["عَيْن","👁️"],["عِنَب","🍇"],["شَمْعَة","🕯️"],["عَلَم","🚩"],["عَسَل","🍯"]]},
+ {l:"غ",w:[["غَيْمَة","☁️"],["غَزَال","🦌"],["غُرَاب","🐦‍⬛"],["غَسَلَ",""]]},
+ {l:"ص",w:[["صَقْر","🦅"],["صُنْدُوق","📦"],["قَمِيص","👕"],["عُصْفُور","🐤"],["صَابُون","🧼"]]},
+ {l:"ض",w:[["ضِفْدَع","🐸"],["بَيْض","🥚"],["مَرِيض","🤒"],["حَوْض","🛁"]]},
+ {l:"ط",w:[["قِطَّة","🐱"],["بَطَّة","🦆"],["طَبْل","🥁"],["بِطِّيخ","🍉"],["طَمَاطِم","🍅"]]},
+ {l:"ظ",w:[["ظَرْف","✉️"],["نَظَّارَة","👓"],["عَظْم","🦴"],["ظِلّ",""]]},
+ {l:"ه",w:[["هِلَال","🌛"],["نَهْر","🏞️"],["سَهْم","🏹"],["وَجْه","🙂"]]},
+ {l:"ث",w:[["ثَعْلَب","🦊"],["ثَلْج","❄️"],["ثَوْب","👗"],["مُثَلَّث","🔺"]]},
+ {l:"ذ",w:[["ذَهَب","🥇"],["ذُرَة","🌽"],["تِلْمِيذ","🧑‍🎓"],["ذَيْل",""]]},
+ {l:"ء",show:"ء أ إ ئ",w:[["أَسَد","🦁"],["أَرْنَب","🐰"],["مَاء","💧"],["فَأْر","🐭"],["ذِئْب","🐺"],["إِبْرَة","🪡"]]},
+ {l:"ى",w:[["حَلْوَى","🍬"],["مُسْتَشْفَى","🏥"],["مُوسَى",""],["عَلَى",""]]},
+];
+const RSENT=[
+ "دَارٌ وَوَرْدٌ","نَارٌ وَنُورٌ","تَمْرٌ وَمَوْزٌ","خُبْزٌ وَحَلِيبٌ","الغَزَالُ سَرِيعٌ","الثَّلْجُ بَارِدٌ","تِينٌ وَتُوتٌ","زَيْتٌ وَزَيْتُونٌ","رِيمُ تَرْسُمُ بَيْتًا","سَمِيرٌ وَلَدٌ","بَابُ البَيْتِ كَبِيرٌ",
+ "سَمِيرٌ يَرْكَبُ السَّيَّارَةَ","الشَّمْسُ كَبِيرَةٌ","الكَلْبُ فِي البَيْتِ","الفِيلُ كَبِيرٌ",
+ "القَمَرُ مُنِيرٌ","الجَمَلُ يَمْشِي","رِيمُ تَشْرَبُ الحَلِيبَ","الخُبْزُ لَذِيذٌ","العَسَلُ حُلْوٌ",
+ "العُصْفُورُ يُغَرِّدُ","الضِّفْدَعُ يَقْفِزُ","القِطَّةُ تَشْرَبُ الحَلِيبَ","نَظَّارَةُ جَدِّي",
+ "الهِلَالُ جَمِيلٌ","الثَّعْلَبُ ذَكِيٌّ","الأَسَدُ مَلِكُ الغَابَةِ","ذَهَبَ مُوسَى إِلَى المُسْتَشْفَى",
+];
+/* letters used in a word: drop harakat, treat all hamza shapes as ء */
+const rLetters=w=>[...w.replace(/[ً-ٰٟـ\s]/g,"").replace(/[أإئؤآ]/g,m=>m==="آ"?"ءا":"ء")];
+const rKnown=i=>new Set(RL.slice(0,i+1).flatMap(x=>[...x.l]));
+RL.forEach((x,i)=>{x.s=[];x.words=x.w.map(([t,e])=>({t,e,i}))});
+RSENT.forEach(s=>{const i=RL.findIndex((x,j)=>rLetters(s).every(c=>rKnown(j).has(c)));if(i>=0)RL[i].s.push(s)});
+const READ_CHECK=()=>RL.flatMap((x,i)=>x.w.filter(([t])=>!rLetters(t).every(c=>rKnown(i).has(c))).map(([t])=>`${i+1}:${t}`));
+const RFREE=6;
+const rUnlocked=i=>i<RFREE||S.member;
+const rWords=i=>RL.slice(0,i+1).flatMap(x=>x.words);
+
+function readPath(){
+  const kd=kid();kd.doneR=kd.doneR||[];
+  return `<div>${bi("تَعَلَّمِ القِرَاءَة","Learn to read Arabic","title")}
+  <p class="ar pa">${AN(kd.doneR.length)} مِنْ ${AN(RL.length)} دَرْسًا</p>
+  <div class="bar"><span style="width:${Math.round(kd.doneR.length/RL.length*100)}%"></span></div></div>
+  <div class="rgrid">${RL.map((x,i)=>`<button class="rstep ${kd.doneR.includes(i)?"done":""}" data-r="${i}" style="--c:${COLS[i%4]}">
+    <span class="rl ar">${x.show||[...x.l].join(" ")}</span><span class="rw ar">${x.w[0][0]} ${x.w[0][1]}</span>
+    <span class="lvl ar">${kd.doneR.includes(i)?"✓ ":""}${AN(i+1)}${rUnlocked(i)?"":" 🔒"}</span></button>`).join("")}</div>`;
+}
+function readLesson(i){
+  if(!rUnlocked(i))return paywall("تَعَلَّمِ القِرَاءَة","Learn to read Arabic");
+  const x=RL[i];top0();
+  const letters=x.show?x.show.split(" "):[...x.l];
+  const shapes=c=>{if("ةءأإئى".includes(c))return [c];return NOJOIN.includes(c)?[c,"ـ"+c]:[c,c+"ـ","ـ"+c+"ـ","ـ"+c]};
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الدُّرُوس","Lessons")}</button>
+  <div class="focus"><span class="lvl ar">الدَّرْس ${AN(i+1)} مِنْ ${AN(RL.length)}</span>
+  ${bi(i===0?"حُرُوفٌ جَدِيدَة":"حَرْفٌ جَدِيد",i===0?"New letters":"New letter","h")}
+  <div class="newl">${letters.map(c=>`<div class="nl"><span class="ar big2">${c}</span><span class="ar shp">${shapes(c).join("  ")}</span></div>`).join("")}</div></div>
+  <div>${bi("اقْرَأِ الكَلِمَات","Read the words","h")}</div>
+  <div class="wcards">${x.words.map(w=>`<div class="wcard">${w.e?`<span class="em">${w.e}</span>`:""}<span class="ar">${w.t}</span></div>`).join("")}</div>
+  ${x.s.length?`<div>${bi("اقْرَأِ الجُمْلَة","Read the sentence","h")}</div><div class="sents">${x.s.map(s=>`<div class="sent ar">${s}</div>`).join("")}</div>`:""}
+  <div class="row"><button class="btn" id="pl">${bi("🎮 الْعَبْ","Play this lesson")}</button></div>
+  <div class="row"><button class="btn ghost" id="prev">${T.prev}</button><button class="btn" id="next">${i===RL.length-1?T.finish:bi("الدَّرْسُ التَّالِي ←","Next lesson")}</button></div>
+  <span class="lvl ar">الحُرُوفُ الَّتِي تَعَلَّمْتَهَا</span><div class="grid">${[...rKnown(i)].map(c=>`<span class="tile sm">${c}</span>`).join("")}</div>`;
+  $("#bk").onclick=()=>learn("read");
+  $("#pl").onclick=()=>rGame(pick(["pic","word","spell"]),0,0,i);
+  $("#prev").onclick=()=>i?readLesson(i-1):learn("read");
+  $("#next").onclick=()=>{const kd=kid();kd.doneR=kd.doneR||[];if(!kd.doneR.includes(i))kd.doneR.push(i);star(2);
+    if(i===RL.length-1)return readCert();readLesson(i+1)};
+}
+function readCert(){
+  const kd=kid();star(3);top0();
+  view.innerHTML=`<div class="cert"><div class="cert-in">
+   <div class="ar cert-top">مَا شَاءَ اللَّه</div>${bi("شَهَادَةُ إِتْمَام","Certificate of completion")}
+   <h1>${escH(kd.name)}</h1>${bi("تَعَلَّمَ قِرَاءَةَ كُلِّ الحُرُوف","learned to read every letter","h")}
+   <div class="cert-stars">★ ★ ★</div></div></div>
+  <div class="row"><button class="btn" id="pt">${bi("الدُّرُوس","Back to lessons")}</button></div>`;
+  $("#pt").onclick=()=>learn("read");
+}
+
+/* ---------- reading games ---------- */
+const RGAMES={
+ pic:{a:"اقْرَأْ وَاخْتَرِ الصُّورَة",name:"Read & pick the picture",ic:"🐪"},
+ word:{a:"أَيْنَ الكَلِمَة؟",name:"Find the word",ic:"دَار"},
+ spell:{a:"رَكِّبِ الكَلِمَة",name:"Build the word",ic:"ب ا ب"},
+};
+const rMaxLesson=()=>{const kd=kid();const d=(kd.doneR||[]);let m=d.length?Math.max(...d)+1:0;if(!S.member)m=Math.min(m,RFREE-1);return Math.min(m,RL.length-1)};
+const uniqEmoji=ws=>{const seen=new Set();return ws.filter(w=>w.e&&!seen.has(w.e)&&seen.add(w.e))};
+const bare=t=>t.replace(/[ً-ٰٟ]/g,"");
+function rGame(kind,round,score,upTo){
+  if(upTo===undefined)upTo=rMaxLesson();
+  const g=RGAMES[kind],N=8;top0();
+  if(round>=N){star(3);
+    view.innerHTML=`<button class="back" id="bk">← ${bi("الأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
+    ${bi(g.a,g.name,"h")}<span class="meter ar">★ ${AN(score)} / ${AN(N)}</span>
+    <div class="row"><button class="btn" id="again">${bi("مَرَّةً أُخْرَى","Play again")}</button><button class="btn ghost" id="gm">${bi("الدُّرُوس","Lessons")}</button></div></div>`;
+    $("#bk").onclick=play;$("#gm").onclick=()=>learn("read");$("#again").onclick=()=>rGame(kind,0,0,upTo);return}
+  const pool=uniqEmoji(rWords(upTo));
+  let prompt,opts,ok;
+  if(kind==="pic"||kind==="word"){
+    // favour the newest lesson's words
+    const fresh=pool.filter(w=>w.i===upTo),tgt=fresh.length&&Math.random()<.6?pick(fresh):pick(pool);
+    const others=shuffle(pool.filter(w=>w!==tgt)).slice(0,3),all=shuffle([tgt,...others]);
+    ok=j=>all[j]===tgt;
+    if(kind==="pic"){prompt=`<div class="big rword">${tgt.t}</div>${bi("اقْرَأْ وَاخْتَرِ الصُّورَة","Read it, then pick the picture")}`;opts=all.map(w=>`<span class="em">${w.e}</span>`)}
+    else{prompt=`<div class="em huge">${tgt.e}</div>${bi("اخْتَرِ الكَلِمَةَ الصَّحِيحَة","Pick the right word")}`;opts=all.map(w=>`<span class="ar">${w.t}</span>`)}
+    view.innerHTML=`<button class="back" id="bk">← ${bi("الأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}
+     <span class="lvl ar">${AN(round+1)} مِنْ ${AN(N)}</span><div class="bar"><span style="width:${round/N*100}%"></span></div>${prompt}
+     <div class="choices ${kind==="pic"?"pics":"rwords"}">${opts.map((o,j)=>`<button data-j="${j}">${o}</button>`).join("")}</div><p class="note ar fb" id="why"></p></div>`;
+    $("#bk").onclick=play;
+    view.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{
+      if(ok(+b.dataset.j)){b.classList.add("good");star();$("#why").textContent=T.good+" "+tgt.t;setTimeout(()=>rGame(kind,round+1,score+1,upTo),1100)}
+      else{b.classList.add("bad");$("#why").textContent=T.again;setTimeout(()=>b.classList.remove("bad"),400)}});
+    return;
+  }
+  // spell: tap the letters in order
+  const short=pool.filter(w=>rLetters(w.t).length<=5),tgt=pick(short.length?short:pool),ls=[...bare(tgt.t)].filter(c=>c!=="ّ");
+  const tiles=shuffle(ls.map((c,k)=>({c,k})));let pos=0;
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}
+   <span class="lvl ar">${AN(round+1)} مِنْ ${AN(N)}</span><div class="bar"><span style="width:${round/N*100}%"></span></div>
+   <div class="em huge">${tgt.e}</div>${bi("رَكِّبِ الكَلِمَةَ حَرْفًا حَرْفًا","Tap the letters in order")}
+   <div class="built ar" id="built">&nbsp;</div>
+   <div class="tiles">${tiles.map((t,j)=>`<button class="ltile ar" data-t="${j}">${t.c}</button>`).join("")}</div>
+   <p class="note ar fb" id="why"></p></div>`;
+  $("#bk").onclick=play;
+  view.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{
+    const t=tiles[+b.dataset.t];if(b.disabled)return;
+    if(t.c===ls[pos]){b.disabled=true;b.classList.add("good");pos++;$("#built").textContent=ls.slice(0,pos).join("");
+      if(pos===ls.length){star();$("#built").textContent=tgt.t;$("#why").textContent=T.good;setTimeout(()=>rGame(kind,round+1,score+1,upTo),1300)}}
+    else{b.classList.add("bad");$("#why").textContent=T.again;setTimeout(()=>b.classList.remove("bad"),400)}});
+}
+
 /* ================= CHILDREN ================= */
 function kids(){
   top0();
@@ -794,12 +979,13 @@ function parents(){
   <div class="games">${S.kids.map(k=>`<div class="plan"><div class="row" style="justify-content:flex-start;gap:8px"><span class="av sm">${k.av}</span><h2>${escH(k.name)}</h2></div>
     <div class="bar"><span style="width:${Math.round(k.done.length/UNITS.length*100)}%"></span></div>
     <p>${k.done.length} of ${UNITS.length} levels · ★ ${k.stars} · 🔥 ${k.streak}-day streak</p>
+    <p>Learn to read: ${(k.doneR||[]).length} of ${RL.length} lessons</p>
     <p class="note">${k.done.length?"Finished: "+k.done.map(id=>UNITS[UID(id)].name).join(", "):"No levels finished yet"}</p>
     ${S.kids.length>1?`<button class="btn ghost" data-del="${k.id}">Remove</button>`:""}</div>`).join("")}</div>
   <h2>Memberships</h2><p>Priced so every family can afford it. One plan covers all your children on phone, iPad and computer.</p>
   <div class="plans">
-   <div class="plan ${S.member?"":"best"}"><h2>Free</h2><div class="price">$0</div><ul><li>Levels 1–5: letters, shapes, joined letters, muqaṭṭaʿāt, harakat</li><li>Find & Tap, Twin Letters, Shape Finder, Memory Cards</li></ul></div>
-   <div class="plan ${S.member?"best":""}"><span class="tag">Most families</span><h2>Family</h2><div class="price">$3.99<small> / month</small></div><ul><li>All ${UNITS.length} levels, through Qurʾān practice</li><li>Tajwīd: ${TAJ.length} groups, ${RULE_COUNT} rules</li><li>All ${GAMES.length} games</li><li>Voice check on recordings</li><li>Up to 4 children</li></ul></div>
+   <div class="plan ${S.member?"":"best"}"><h2>Free</h2><div class="price">$0</div><ul><li>Levels 1–5: letters, shapes, joined letters, muqaṭṭaʿāt, harakat</li><li>Learn to read: first ${RFREE} lessons</li><li>Find & Tap, Twin Letters, Shape Finder, Memory Cards</li></ul></div>
+   <div class="plan ${S.member?"best":""}"><span class="tag">Most families</span><h2>Family</h2><div class="price">$3.99<small> / month</small></div><ul><li>All ${UNITS.length} levels, through Qurʾān practice</li><li>All ${RL.length} Learn-to-read lessons</li><li>Tajwīd: ${TAJ.length} groups, ${RULE_COUNT} rules</li><li>All ${GAMES.length} games</li><li>Voice check on recordings</li><li>Up to 4 children</li></ul></div>
    <div class="plan"><h2>Family yearly</h2><div class="price">$29.99<small> / year</small></div><ul><li>Everything in Family</li><li>About $2.50 a month</li></ul></div>
    <div class="plan"><h2>Masjid & school</h2><div class="price">$1<small> / child / month</small></div><ul><li>Teacher dashboard</li><li>Class progress</li><li>Hardship scholarships</li></ul></div>
   </div>
@@ -811,7 +997,7 @@ function parents(){
   <div class="row" style="justify-content:flex-start"><button class="btn ghost" id="reset">Reset all progress</button></div></div>`;
   $("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
   view.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.kids=S.kids.filter(k=>k.id!==+b.dataset.del);if(!S.kids.some(k=>k.id===S.cur))S.cur=S.kids[0].id;save();header();parents()});
-  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
+  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
 }
 
 const TABS={learn,play,parents:()=>parentGate(parents)};
