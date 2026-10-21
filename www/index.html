@@ -271,6 +271,18 @@ nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,va
 .rep{white-space:pre-wrap;font-size:1rem;line-height:1.8;background:var(--surface);border-radius:12px;padding:10px;margin:0;direction:rtl;text-align:right;font-family:var(--body)}
 .nm{white-space:nowrap}
 .duaa{font-size:.95rem!important;color:var(--leaf)!important}
+/* daily homework */
+.hw{background:var(--surface);border:2px solid var(--sun);border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.hwh{display:flex;justify-content:space-between;align-items:center}
+.hwn{font-family:var(--display);font-weight:800;font-size:1.2rem;background:var(--sun);color:#16324F;border-radius:999px;padding:2px 12px}
+.hwi{display:flex;align-items:center;gap:12px;background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:10px 12px;text-align:start}
+.hwi.ok{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 14%,var(--surface))}
+.hwc{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:1.4rem;background:var(--surface);border:2px solid var(--line)}
+.hwi.ok .hwc{background:var(--leaf);color:#fff;border-color:var(--leaf);font-weight:800}
+.hwt{display:flex;flex-direction:column;gap:4px;min-width:0}.hwt .ar{font-size:1.15rem;line-height:1.7}.hwt small{font-size:.75rem;font-weight:700;color:var(--muted);line-height:1.2}
+.hwi.ok .hwt .ar{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--leaf) 60%,transparent)}
+.hwdone{text-align:center;font-size:1.3rem;color:var(--leaf);line-height:1.8}
+.hwsent{font-size:2.4rem;width:100%}
 /* spacing fixes: keep last so they win */
 nav button{gap:6px;padding-block:8px 6px}
 nav button .ar.tn{font-size:1.1rem;line-height:1.9;display:block}
@@ -619,14 +631,14 @@ function learn(tr){
   if(typeof tr==="string"){S.track=tr;save()}
   top0();const kd=kid();
   if(S.track==="read"){
-    view.innerHTML=`${greetCard()}${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${Object.entries(RGAMES).map(([id,g],j)=>`<button class="chip" data-rg="${id}" style="background:${COLS[j%4]}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}</span><small>${g.name}</small></button>`).join("")}</div></div>${readPath()}`;
+    view.innerHTML=`${greetCard()}${hwCard()}${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${Object.entries(RGAMES).map(([id,g],j)=>`<button class="chip" data-rg="${id}" style="background:${COLS[j%4]}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}</span><small>${g.name}</small></button>`).join("")}</div></div>${readPath()}`;
     view.querySelectorAll("[data-trk]").forEach(b=>b.onclick=()=>learn(b.dataset.trk));
     view.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>rGame(b.dataset.rg,0,0));
     view.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>readLesson(+b.dataset.r));
-    $("#alb").onclick=album;
+    $("#alb").onclick=album;wireHw();
     return;
   }
-  view.innerHTML=`${greetCard()}${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${GAMES.map(g=>`<button class="chip" data-g="${g.id}" style="background:${g.col}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}${!g.free&&!S.member?" 🔒":""}</span><small>${g.name}</small></button>`).join("")}</div></div>
+  view.innerHTML=`${greetCard()}${hwCard()}${trackSwitch()}<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${GAMES.map(g=>`<button class="chip" data-g="${g.id}" style="background:${g.col}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}${!g.free&&!S.member?" 🔒":""}</span><small>${g.name}</small></button>`).join("")}</div></div>
   <div>${bi("طَرِيقُ الْقِرَاءَة",escH(kd.name)+"'s reading path","title")}
   <p class="ar pa">${AN(kd.done.length)} مِنْ ${AN(UNITS.length)} مُسْتَوًى</p>
   <div class="bar"><span style="width:${Math.round(kd.done.length/UNITS.length*100)}%"></span></div></div>
@@ -637,7 +649,7 @@ function learn(tr){
   view.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>openUnit(+b.dataset.u,0));
   view.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>startGame(b.dataset.g));
   view.querySelectorAll("[data-trk]").forEach(b=>b.onclick=()=>learn(b.dataset.trk));
-  $("#alb").onclick=album;
+  $("#alb").onclick=album;wireHw();
 }
 function openUnit(k,i){
   const u=UNITS[k];top0();
@@ -661,7 +673,7 @@ function wireNav(k,i,len,unit){
   $("#bk").onclick=learn;wireRec();wireSay();
   const lg=$("#lg");if(lg)lg.onclick=()=>levelGame(lg.dataset.lg);
   $("#prev").onclick=()=>unit(k,(i+len-1)%len);
-  $("#next").onclick=()=>{star();if(i===len-1)return finishLevel(k);unit(k,i+1)};
+  $("#next").onclick=()=>{star();hwMark("lesson");if(i===len-1)return finishLevel(k);unit(k,i+1)};
   view.querySelectorAll("[data-j]").forEach(t=>t.onclick=()=>unit(k,+t.dataset.j));
 }
 function letters(k,i){
@@ -758,7 +770,7 @@ function quran(s){
   $("#bk").onclick=learn;wireRec();
   view.querySelectorAll(".ayah[data-say]").forEach(b=>b.onclick=()=>{view.querySelectorAll(".ayah").forEach(x=>x.classList.remove("hi"));b.classList.add("hi");tapSay(b.dataset.say)});
   view.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>quran(+b.dataset.s));
-  $("#next").onclick=()=>{star(2);s<SURAHS.length-1?quran(s+1):finishLevel(UID("quran"))};
+  $("#next").onclick=()=>{star(2);hwMark("lesson");s<SURAHS.length-1?quran(s+1):finishLevel(UID("quran"))};
 }
 
 /* ================= GAMES ================= */
@@ -808,7 +820,7 @@ function deckNext(key,list,round){if(round===0||!DECK[key]||DECK[key].length!==l
 const prog=(r,n)=>`<span class="lvl ar">الْحَرْف ${AN(r+1)} مِنْ ${AN(n)}</span><div class="bar"><span style="width:${Math.round(r/n*100)}%"></span></div>`;
 const ask=(a,e)=>`<div class="ask">${bi(a,e)}</div>`;
 function gameDone(id,count,again){
-  sfx("win");award("أَنْهَيْتَ اللُّعْبَة 🏆");
+  sfx("win");hwMark("game");award("أَنْهَيْتَ اللُّعْبَة 🏆");
   const g=G(id);star(3);top0();
   view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
   ${bi(g.a,g.name,"h")}${bi("لَعِبْتَ كُلَّ الْحُرُوف ("+AN(count)+")","You played all "+count+" letters")}
@@ -996,7 +1008,7 @@ function readLesson(i){
   $("#bk").onclick=()=>learn("read");
   $("#pl").onclick=()=>rGame(pick(["pic","word","spell"]),0,0,i);
   $("#prev").onclick=()=>i?readLesson(i-1):learn("read");
-  $("#next").onclick=()=>{const kd=kid();kd.doneR=kd.doneR||[];const first=!kd.doneR.includes(i);if(first)kd.doneR.push(i);star(2);if(first&&i<RL.length-1)award("أَنْهَيْتَ الدَّرْس "+AN(i+1)+" ✏️");
+  $("#next").onclick=()=>{const kd=kid();kd.doneR=kd.doneR||[];const first=!kd.doneR.includes(i);if(first)kd.doneR.push(i);star(2);hwMark("lesson");if(first&&i<RL.length-1)award("أَنْهَيْتَ الدَّرْس "+AN(i+1)+" ✏️");
     if(i===RL.length-1)return readCert();readLesson(i+1)};
 }
 function readCert(){
@@ -1023,7 +1035,7 @@ function rGame(kind,round,score,upTo){
   curItem=null;
   if(upTo===undefined)upTo=rMaxLesson();
   const g=RGAMES[kind],N=8;top0();
-  if(round>=N){star(3);sfx("win");award("أَنْهَيْتَ اللُّعْبَة 🏆");
+  if(round>=N){star(3);sfx("win");hwMark("game");award("أَنْهَيْتَ اللُّعْبَة 🏆");
     view.innerHTML=`<button class="back" id="bk">← ${bi("الأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
     ${bi(g.a,g.name,"h")}<span class="meter ar">★ ${AN(score)} / ${AN(N)}</span>
     <div class="row"><button class="btn" id="again">${bi("مَرَّةً أُخْرَى","Play again")}</button><button class="btn ghost" id="gm">${bi("الدُّرُوس","Lessons")}</button></div></div>`;
@@ -1199,7 +1211,7 @@ function weakLetters(k){return Object.entries(k.miss||{}).filter(([,v])=>v>=2).s
 function strongCount(k){const learned=new Set();(k.done||[]).forEach(id=>{if(["letters","shapes","harakat"].includes(id))ALL.forEach(c=>learned.add(c))});(k.doneR||[]).forEach(i=>[...RL[i].l].forEach(c=>learned.add(c)));return learned.size}
 function reportText(k){
   const w=weekStats(k);
-  return `🌙 تقرير ${k.name} الأسبوعي من تطبيق اقرأ Steps\n⏱️ ${w.min} دقيقة تعلّم في ${w.act} أيام\n★ ${k.stars} نجمة · 🎁 ${(k.stickers||[]).length} ملصقاً\n📖 مستويات القرآن: ${(k.done||[]).length} من ${UNITS.length}\n✏️ دروس القراءة: ${(k.doneR||[]).length} من ${RL.length}\nما شاء الله، بارك الله فيه! 🤲`;
+  return `🌙 تقرير ${k.name} الأسبوعي من تطبيق اقرأ Steps\n⏱️ ${w.min} دقيقة تعلّم في ${w.act} أيام\n★ ${k.stars} نجمة · 🎁 ${(k.stickers||[]).length} ملصقاً\n📚 أيام الواجب: ${lastDays(7).filter(d=>(k.hwDays||[]).includes(d)).length} من 7\n📖 مستويات القرآن: ${(k.done||[]).length} من ${UNITS.length}\n✏️ دروس القراءة: ${(k.doneR||[]).length} من ${RL.length}\nما شاء الله، بارك الله فيه! 🤲`;
 }
 function parentDash(){
   const k=kid(),w=weekStats(k),weak=weakLetters(k),tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length];
@@ -1211,6 +1223,8 @@ function parentDash(){
     <div class="kpi"><b>${w.act}/7</b><span>days practised</span></div>
     <div class="kpi"><b>${strongCount(k)}</b><span>letters learned</span></div>
     <div class="kpi"><b>${(k.stickers||[]).length}</b><span>stickers earned</span></div>
+    <div class="kpi"><b>${lastDays(7).filter(d=>(k.hwDays||[]).includes(d)).length}/7</b><span>homework days</span></div>
+    <div class="kpi"><b>${k.hw&&k.hw.d===today()?Object.values(k.hw.done).filter(Boolean).length:0}/3</b><span>today's homework</span></div>
    </div>
    <span class="lvl">Minutes per day</span>${weekBars(k)}
    <div class="split">
@@ -1236,6 +1250,59 @@ function practiceWeak(){
     const c=order[r++];curItem=c;const opts=four(ALL.indexOf(c)).map(i=>({t:ALL[i],ok:ALL[i]===c}));
     quiz("hunt",score,`<span class="lvl ar">تَدْرِيبٌ خَاصّ · ${AN(r)} مِنْ ${AN(order.length)}</span><div class="ask">${bi("ابْحَثْ عَنْ","Find")}</div><div class="findme">${bi(NAME(c)[2],NAME(c)[1])}</div>`,opts.map(o=>o.t),j=>opts[j].ok,step);
   })(0);
+}
+
+
+/* ================= DAILY HOMEWORK: 3 short tasks, new every day ================= */
+function nextReadLesson(k){const d=k.doneR||[];for(let i=0;i<RL.length;i++)if(!d.includes(i))return i;return -1}
+function hwSentence(k){
+  const d=(k.doneR||[]).slice().sort((a,b)=>b-a);
+  for(const i of d)if(RL[i].s.length)return RL[i].s[0];
+  const i=d.length?d[0]:0;return RL[i].w.map(x=>x[0]).join("  ");
+}
+function hw(){
+  const k=kid(),t=today();
+  if(!k.hw||k.hw.d!==t){
+    const nr=nextReadLesson(k);
+    k.hw={d:t,lesson:nr>=0&&rUnlocked(nr)?{kind:"read",i:nr}:{kind:"quran"},sent:hwSentence(k),done:{lesson:false,game:false,read:false},paid:false};
+    save();
+  }
+  return k.hw;
+}
+function hwLessonLabel(h){return h.lesson.kind==="read"?`الدَّرْس ${AN(h.lesson.i+1)}: ${RL[h.lesson.i].show||[...RL[h.lesson.i].l].join(" ")}`:"سُورَةٌ مِنَ القُرْآن"}
+function hwCard(){
+  const h=hw(),n=Object.values(h.done).filter(Boolean).length;
+  const item=(key,ic,a,e)=>`<button class="hwi ${h.done[key]?"ok":""}" data-hw="${key}"><span class="hwc">${h.done[key]?"✓":ic}</span><span class="hwt"><span class="ar">${a}</span><small>${e}</small></span></button>`;
+  return `<div class="hw"><div class="hwh">${bi("📚 وَاجِبُ اليَوْم","Today's homework","h")}<span class="hwn ar">${AN(n)} مِنْ ٣</span></div>
+   ${item("lesson","📖",hwLessonLabel(h),"Do today's lesson")}
+   ${item("game","🎮","الْعَبْ لُعْبَةً حَتَّى النِّهَايَة","Finish one game")}
+   ${item("read","👪","اقْرَأْ لِأُمِّكَ أَوْ أَبِيك","Read aloud to a parent")}
+   ${n===3?`<div class="hwdone ar">🌟 أَحْسَنْتَ! أَنْهَيْتَ وَاجِبَ اليَوْم</div>`:""}</div>`;
+}
+function wireHw(){
+  view.querySelectorAll("[data-hw]").forEach(b=>b.onclick=()=>{
+    const h=hw(),key=b.dataset.hw;
+    if(key==="lesson")return h.lesson.kind==="read"?readLesson(h.lesson.i):(S.member?quran(Math.floor(Math.random()*SURAHS.length)):openUnit(0,0));
+    if(key==="game")return S.track==="read"?rGame(pick(["pic","word","spell"]),0,0):startGame("hunt");
+    if(key==="read")return hwRead();
+  });
+}
+function hwRead(){
+  const h=hw();top0();
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الرَّئِيسِيَّة","Home")}</button>
+  <div class="focus"><div class="big" style="font-size:3.4rem">👪</div>${bi("اقْرَأْ هَذَا لِأُمِّكَ أَوْ أَبِيك","Read this out loud to your mum or dad","h")}
+  <div class="sent ar hwsent">${h.sent}</div>
+  <p class="note">Parent: listen to your child read, then tap the button and answer the question to confirm.</p>
+  <button class="btn" id="heard">${bi("👂 سَمِعْتُهُ يَقْرَأ","I heard my child read")}</button></div>`;
+  $("#bk").onclick=learn;
+  $("#heard").onclick=()=>parentGate(()=>{hwMark("read");learn()},hwRead);
+}
+function hwMark(key){
+  const h=hw();if(h.done[key])return;h.done[key]=true;save();
+  const n=Object.values(h.done).filter(Boolean).length;
+  if(n===3&&!h.paid){h.paid=true;const k=kid();k.hwDays=k.hwDays||[];if(!k.hwDays.includes(h.d))k.hwDays.push(h.d);save();
+    palSay("أَنْهَيْتَ وَاجِبَ اليَوْم! 📚🌟","big");award("أَنْهَيْتَ وَاجِبَ اليَوْم 📚")}
+  else palSay(`✓ ${AN(n)} مِنْ ٣ مِنَ الوَاجِب`,"big");
 }
 
 /* ================= CHILDREN ================= */
@@ -1282,7 +1349,7 @@ function parents(){
   wireDash();
   $("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
   view.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.kids=S.kids.filter(k=>k.id!==+b.dataset.del);if(!S.kids.some(k=>k.id===S.cur))S.cur=S.kids[0].id;save();header();parents()});
-  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],stickers:[],day:null,chest:20,log:{},miss:{},streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
+  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],stickers:[],day:null,chest:20,log:{},miss:{},hw:null,hwDays:[],streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
 }
 
 const TABS={learn,play,parents:()=>parentGate(parents)};
