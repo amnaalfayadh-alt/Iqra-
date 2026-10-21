@@ -254,6 +254,23 @@ nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,va
 .hint{animation:glow 1s ease-in-out infinite;border-color:var(--sun)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--sun) 55%,transparent)}
 @keyframes glow{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--sun) 25%,transparent)}}
 @media (prefers-reduced-motion:reduce){.gpal,#pal .pf,.gs,.hint{animation:none!important}}
+/* parent dashboard */
+.dash{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:24px;padding:16px}
+.dash select{font:inherit;padding:6px 10px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{background:var(--bg);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:var(--display);font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}.kpi span{font-size:.85rem;color:var(--muted);font-weight:700}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;height:150px}
+.wkc{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.wkb{flex:1;width:100%;max-width:36px;background:var(--bg);border-radius:10px;display:flex;align-items:flex-end;overflow:hidden}
+.wkb span{display:block;width:100%;background:var(--leaf);border-radius:10px 10px 4px 4px;min-height:3px}
+.wkv{font-size:.75rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1em}.wkd{font-size:.72rem;color:var(--muted);font-weight:700}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.box{background:var(--bg);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.weak{display:flex;flex-wrap:wrap;gap:8px}.weak .ar{font-size:2rem;width:56px;height:60px;display:flex;align-items:center;justify-content:center;line-height:1.4;padding-bottom:10px;background:var(--surface);border:2px solid var(--coral);border-radius:14px}
+.rep{white-space:pre-wrap;font-size:1rem;line-height:1.8;background:var(--surface);border-radius:12px;padding:10px;margin:0;direction:rtl;text-align:right;font-family:var(--body)}
+.nm{white-space:nowrap}
+.duaa{font-size:.95rem!important;color:var(--leaf)!important}
 /* spacing fixes: keep last so they win */
 nav button{gap:6px;padding-block:8px 6px}
 nav button .ar.tn{font-size:1.1rem;line-height:1.9;display:block}
@@ -457,7 +474,7 @@ const RULE_COUNT=TAJ.reduce((n,g)=>n+g.rules.length,0);
 /* ================= STATE: children, stars, streaks, membership ================= */
 const AVATARS=["🌙","⭐","🌸","🦁","🐢","🚀","🐪","🌴"];
 const today=()=>new Date().toISOString().slice(0,10);
-let S={kids:[{id:1,name:"Little reader",av:"🌙",stars:0,done:[],streak:0,last:""}],cur:1,member:false};
+let S={kids:[{id:1,name:"صَدِيقِي",av:"🌙",stars:0,done:[],streak:0,last:""}],cur:1,member:false};
 try{const s=JSON.parse(localStorage.getItem("iqraState")||"null");if(s&&s.kids&&s.kids.length)S=s}catch(e){}
 const save=()=>{try{localStorage.setItem("iqraState",JSON.stringify(S))}catch(e){}};
 const kid=()=>S.kids.find(k=>k.id===S.cur)||S.kids[0];
@@ -467,7 +484,7 @@ function header(){const k=kid();$("#who").innerHTML=`<span>${k.av}</span>${escH(
 function star(n=1){
   const k=kid();k.stars+=n;const t=today();
   if(k.last!==t){const y=new Date(Date.now()-864e5).toISOString().slice(0,10);k.streak=k.last===y?k.streak+1:1;k.last=t;if(k.streak>1)toast(`🔥 ${ARNUM(k.streak)} أَيَّامٍ مُتَتَالِيَة`)}
-  save();header();if(typeof onStars==="function")onStars(n);
+  dayLog(k).stars+=n;save();header();if(typeof onStars==="function")onStars(n);
 }
 const setStars=()=>star(); // kept for older calls
 
@@ -804,7 +821,7 @@ function hunt(round,score=0,mode){
   if(mode){tapMode=mode;round=0;score=0}
   const md=TAP_MODES.find(m=>m.id===tapMode),list=md.noAlif?ALL.slice(1):ALL;
   if(round>=list.length)return gameDone("hunt",list.length,()=>hunt(0,0,tapMode));
-  const c=deckNext("tap"+tapMode,list,round);let target,opts,findA,findE;
+  const c=deckNext("tap"+tapMode,list,round);curItem=c;let target,opts,findA,findE;
   if(!md.forms){target=NAME(c)[2];findA=NAME(c)[2];findE=NAME(c)[1];opts=four(ALL.indexOf(c)).map(i=>({t:ALL[i],ok:ALL[i]===c}))}
   else{const f=pick(md.forms);target=f.f(c);findA=NAME(c)[2]+" + "+f.a;findE=f.t(c);
     const own=md.forms.map(x=>({t:x.f(c),ok:x===f}));
@@ -817,7 +834,7 @@ function hunt(round,score=0,mode){
 }
 function twins(round,score=0){
   if(round>=28)return gameDone("twins",28,()=>twins(0));
-  const c=deckNext("twins",ALL,round);
+  const c=deckNext("twins",ALL,round);curItem=c;
   const fams=[...LOOK.filter(f=>f.includes(c)).map(f=>[1,f]),...SOUND.filter(f=>f.includes(c)).map(f=>[0,f])];
   const [look,fam]=pick(fams),n=NAME(c),opts=shuffle(fam.slice()),snd=look?n[2]:base(c)+"َ";
   quiz("twins",score,`${prog(round,28)}${look?bi("مُتَشَابِهَةُ الشَّكْل: عُدَّ النِّقَاط!","Look-alikes: count the dots!"):bi("مُتَشَابِهَةُ الصَّوْت: انْتَبِهْ!","Sound-alikes: listen closely!")}
@@ -827,7 +844,7 @@ function twins(round,score=0){
 }
 function shapeGame(round,score=0){
   if(round>=28)return gameDone("shape",28,()=>shapeGame(0));
-  const c=deckNext("shape",ALL,round),ans=ALL.indexOf(c),join=!NOJOIN.includes(c);
+  const c=deckNext("shape",ALL,round),ans=ALL.indexOf(c),join=!NOJOIN.includes(c);curItem=c;
   const shape=join?pick([c+"ـ","ـ"+c+"ـ","ـ"+c]):"ـ"+c,opts=four(ans);
   quiz("shape",score,`${prog(round,28)}<div class="big">${shape}</div>${ask("أَيُّ حَرْفٍ هَذَا؟","Which letter is this?")}`,opts.map(o=>L[o][0]),
     j=>{if(opts[j]===ans){say(L[ans][2]);return `${T.good} ${L[ans][2]}`}return false},s=>shapeGame(round+1,s));
@@ -835,7 +852,7 @@ function shapeGame(round,score=0){
 function markGame(round,score=0){
   const list=ALL.slice(1);
   if(round>=list.length)return gameDone("marks",list.length,()=>markGame(0));
-  const c=deckNext("marks",list,round),mi=Math.floor(Math.random()*MARKS.length),m=MARKS[mi];
+  curItem=null;const c=deckNext("marks",list,round),mi=Math.floor(Math.random()*MARKS.length),m=MARKS[mi];
   const opts=shuffle([mi,...shuffle([...MARKS.keys()].filter(k=>k!==mi)).slice(0,3)]);
   quiz("marks",score,`${prog(round,list.length)}<div class="big">${m.f(c)}</div>${ask("مَا اسْمُ هَذِهِ الْحَرَكَة؟","Name the mark")}`,
     opts.map(o=>`<span class="ar mk">◌${MARKS[o].m}</span><span class="ar on">${MARKS[o].a}</span><small>${MARKS[o].n}</small>`),
@@ -846,6 +863,7 @@ const playBtn=id=>LEVEL_GAME[id]||TAP_MODES.some(m=>m.id===id)?`<button class="b
 function levelGame(id){top0();if(LEVEL_GAME[id])return LEVEL_GAME[id]();hunt(0,0,id)}
 let sortGroup=-1;
 function sorter(score,t){
+  curItem=null;
   if(t!==undefined)sortGroup=t;
   const gi=sortGroup<0?Math.floor(Math.random()*TAJ.length):sortGroup,g=TAJ[gi];
   const ri=Math.floor(Math.random()*g.rules.length),r=g.rules[ri];
@@ -858,6 +876,7 @@ function sorter(score,t){
   view.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>sorter(score,+b.dataset.sg));
 }
 function stops(score){
+  curItem=null;
   const ai=Math.floor(Math.random()*WAQF.length),w=WAQF[ai];
   const opts=shuffle([ai,...shuffle([...WAQF.keys()].filter(k=>k!==ai)).slice(0,3)]);
   quiz("stops",score,`${ask("مَاذَا تَعْنِي هَذِهِ الْعَلَامَة؟","What does this sign mean?")}<div class="big"><span class="sign">${w.sign}</span></div><span class="lvl ar">${w.big}</span>`,
@@ -887,6 +906,7 @@ function memory(round=0){
   });
 }
 function bounce(){
+  curItem=null;
   const Q="قطبجد",pool=shuffle([...Q,...shuffle(without("ا"+Q)).slice(0,7)]);let left=5;
   const g=G("bounce");
   view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}
@@ -1000,6 +1020,7 @@ const rMaxLesson=()=>{const kd=kid();const d=(kd.doneR||[]);let m=d.length?Math.
 const uniqEmoji=ws=>{const seen=new Set();return ws.filter(w=>w.e&&!seen.has(w.e)&&seen.add(w.e))};
 const bare=t=>t.replace(/[ً-ٰٟ]/g,"");
 function rGame(kind,round,score,upTo){
+  curItem=null;
   if(upTo===undefined)upTo=rMaxLesson();
   const g=RGAMES[kind],N=8;top0();
   if(round>=N){star(3);sfx("win");award("أَنْهَيْتَ اللُّعْبَة 🏆");
@@ -1114,18 +1135,18 @@ function goalRing(){
 function greetCard(){
   const k=kx(),h=new Date().getHours(),hi=h<12?"صَبَاحُ الخَيْر":"مَسَاءُ الخَيْر";
   const msg=k.day.goal?"أَكْمَلْتَ هَدَفَ اليَوْم! أَنْتَ بَطَل 🏆":k.day.n?`بَقِيَ ${AN(DAY_GOAL-k.day.n)} نَجْمَةً لِهَدَفِ اليَوْم`:"هَيَّا نَتَعَلَّمُ شَيْئًا جَدِيدًا اليَوْم!";
-  return `<div class="greet"><span class="gpal">${PAL.face}</span><div class="gtxt"><b class="ar">${hi} يَا <bdi>${escH(k.name)}</bdi>!</b><span class="ar">${msg}</span></div>
+  return `<div class="greet"><span class="gpal">${PAL.face}</span><div class="gtxt"><b class="ar">${hi} يَا <bdi class="nm">${escH(k.name)}</bdi>!</b><span class="ar">${msg}</span><span class="ar duaa">رَبِّ زِدْنِي عِلْمًا 🤲</span></div>
    <div class="gside">${goalRing()}<button class="albbtn" id="alb"><span>🎁</span><span class="ar">${AN(k.stickers.length)}</span></button></div></div>`;
 }
 
 /* reactions to every answer (hooked into the global click listener) */
 function reactRight(b){
-  combo++;const r=b.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,18);
+  noteMiss(true);combo++;const r=b.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,18);
   if(combo===3||combo===5||combo%10===0){star(1);sfx("win");confetti(innerWidth/2,innerHeight/3,60);palSay(`🔥 ${AN(combo)} صَحِيحَة مُتَتَالِيَة! +★`,"big")}
   else if(Math.random()<.35)palSay(pick1(PRAISE));
 }
 function reactWrong(b){
-  combo=0;const box=b.closest(".choices,.tiles,.bubbles");if(!box)return;
+  noteMiss(false);combo=0;const box=b.closest(".choices,.tiles,.bubbles");if(!box)return;
   const n=+(box.dataset.miss||0)+1;box.dataset.miss=n;
   if(n===1)palSay(pick1(CHEER),"soft");
   else{const ok=box.querySelector("[data-ok]:not(.good):not(.pop):not([disabled])")||(window.spellHint&&window.spellHint());
@@ -1142,6 +1163,80 @@ setInterval(()=>{
    <small class="en">You've been learning for ${BREAK_MIN} minutes. Time for a short break!</small><div class="row"><button class="btn" id="gok">${bi("حَسَنًا","OK")}</button></div></div>`;
   m.hidden=false;$("#gok").onclick=()=>{m.hidden=true};
 },30e3);
+
+
+/* ================= FOR PARENTS: time, weak letters, weekly report, tips ================= */
+let curItem=null, lastAct=Date.now();
+document.addEventListener("click",()=>{lastAct=Date.now()},true);
+function dayLog(k,d=today()){k.log=k.log||{};k.log[d]=k.log[d]||{min:0,stars:0};return k.log[d]}
+/* count learning minutes only while the app is open and the child is active */
+setInterval(()=>{
+  if(document.visibilityState!=="visible"||Date.now()-lastAct>120e3)return;
+  const k=kid();dayLog(k).min+=.5;save();
+},30e3);
+function noteMiss(ok){if(!curItem)return;const k=kid();k.miss=k.miss||{};k.miss[curItem]=Math.max(0,(k.miss[curItem]||0)+(ok?-1:2));save()}
+const lastDays=n=>Array.from({length:n},(_,i)=>new Date(Date.now()-(n-1-i)*864e5).toISOString().slice(0,10));
+const TIPS=[
+ ["Little and often","10 minutes every day works better than one long session a week."],
+ ["Praise the effort","Say “you tried hard!” more than “you're smart.” Children then keep trying when it gets hard."],
+ ["Sit with them sometimes","Children learn faster when a parent listens to them read, even for 5 minutes."],
+ ["Mistakes are normal","When your child gets one wrong, the app gives a hint. Let them find the answer themselves."],
+ ["Connect it to real life","Point out letters on signs, food boxes and books: “That's a ب like in بَاب!”"],
+ ["Celebrate together","Look at the sticker collection together and let your child show you what they earned."],
+ ["Read Qurʾān in front of them","Children copy what they see. Let them hear you recite, even a short sūrah."],
+];
+function weekBars(k){
+  const days=lastDays(7),vals=days.map(d=>Math.round((k.log&&k.log[d]?k.log[d].min:0))),mx=Math.max(10,...vals);
+  const names=days.map(d=>new Date(d+"T12:00").toLocaleDateString("en",{weekday:"short"}));
+  return `<div class="wk">${vals.map((v,i)=>`<div class="wkc"><span class="wkv">${v||""}</span><div class="wkb"><span style="height:${v/mx*100}%"></span></div><span class="wkd">${names[i]}</span></div>`).join("")}</div>`;
+}
+function weekStats(k){
+  const days=lastDays(7),L=k.log||{};
+  const min=Math.round(days.reduce((n,d)=>n+(L[d]?L[d].min:0),0)),act=days.filter(d=>L[d]&&L[d].min>=1).length;
+  return {min,act};
+}
+function weakLetters(k){return Object.entries(k.miss||{}).filter(([,v])=>v>=2).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([c])=>c)}
+function strongCount(k){const learned=new Set();(k.done||[]).forEach(id=>{if(["letters","shapes","harakat"].includes(id))ALL.forEach(c=>learned.add(c))});(k.doneR||[]).forEach(i=>[...RL[i].l].forEach(c=>learned.add(c)));return learned.size}
+function reportText(k){
+  const w=weekStats(k);
+  return `🌙 تقرير ${k.name} الأسبوعي من تطبيق اقرأ Steps\n⏱️ ${w.min} دقيقة تعلّم في ${w.act} أيام\n★ ${k.stars} نجمة · 🎁 ${(k.stickers||[]).length} ملصقاً\n📖 مستويات القرآن: ${(k.done||[]).length} من ${UNITS.length}\n✏️ دروس القراءة: ${(k.doneR||[]).length} من ${RL.length}\nما شاء الله، بارك الله فيه! 🤲`;
+}
+function parentDash(){
+  const k=kid(),w=weekStats(k),weak=weakLetters(k),tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length];
+  return `<div class="dash">
+   <div class="row" style="justify-content:space-between;align-items:center;gap:8px"><div class="row" style="gap:8px;justify-content:flex-start"><span class="av sm">${k.av}</span><h2>${escH(k.name)}'s week</h2></div>
+    ${S.kids.length>1?`<select id="pk" aria-label="Choose child">${S.kids.map(x=>`<option value="${x.id}" ${x.id===k.id?"selected":""}>${escH(x.name)}</option>`).join("")}</select>`:""}</div>
+   <div class="kpis">
+    <div class="kpi"><b>${w.min}</b><span>minutes this week</span></div>
+    <div class="kpi"><b>${w.act}/7</b><span>days practised</span></div>
+    <div class="kpi"><b>${strongCount(k)}</b><span>letters learned</span></div>
+    <div class="kpi"><b>${(k.stickers||[]).length}</b><span>stickers earned</span></div>
+   </div>
+   <span class="lvl">Minutes per day</span>${weekBars(k)}
+   <div class="split">
+    <div class="box"><span class="lvl">Needs practice</span>${weak.length?`<div class="weak">${weak.map(c=>`<span class="ar">${c}</span>`).join("")}</div><p class="note">Letters your child mixed up most in the games.</p><button class="btn" id="prac">Practise these now</button>`:`<p class="note">Nothing yet. As your child plays, letters they mix up will show here.</p>`}</div>
+    <div class="box"><span class="lvl">Tip of the day</span><b>${tip[0]}</b><p>${tip[1]}</p></div>
+   </div>
+   <div class="box"><span class="lvl">Share with family</span><p>Send a short Arabic progress report to grandparents or the teacher.</p>
+    <pre class="ar rep" id="rep">${escH(reportText(k))}</pre><button class="btn ghost" id="cp">Copy report</button></div>
+  </div>`;
+}
+function wireDash(){
+  const pk=$("#pk");if(pk)pk.onchange=()=>{S.cur=+pk.value;save();header();parents()};
+  const pr=$("#prac");if(pr)pr.onclick=()=>practiceWeak();
+  const cp=$("#cp");if(cp)cp.onclick=()=>{const t=reportText(kid());(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Copied! Paste it in WhatsApp")).catch(()=>{const r=document.createRange();r.selectNodeContents($("#rep"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Selected. Tap Copy")})};
+}
+/* practice: Find & Tap that only uses the weak letters */
+function practiceWeak(){
+  const weak=weakLetters(kid());if(!weak.length)return;
+  DECK["taplettersP"]=null;tapMode="letters";
+  const order=shuffle([...weak,...weak,...weak]);let r=0;
+  (function step(score){
+    if(r>=order.length){gameDone("hunt",order.length,practiceWeak);return}
+    const c=order[r++];curItem=c;const opts=four(ALL.indexOf(c)).map(i=>({t:ALL[i],ok:ALL[i]===c}));
+    quiz("hunt",score,`<span class="lvl ar">تَدْرِيبٌ خَاصّ · ${AN(r)} مِنْ ${AN(order.length)}</span><div class="ask">${bi("ابْحَثْ عَنْ","Find")}</div><div class="findme">${bi(NAME(c)[2],NAME(c)[1])}</div>`,opts.map(o=>o.t),j=>opts[j].ok,step);
+  })(0);
+}
 
 /* ================= CHILDREN ================= */
 function kids(){
@@ -1162,7 +1257,9 @@ function kids(){
 /* ================= PARENTS ================= */
 function parents(){
   top0();
-  view.innerHTML=`<div dir="ltr" class="ltr"><div><h1>Parents</h1><p>Progress for each child, and your membership.</p></div>
+  view.innerHTML=`<div dir="ltr" class="ltr"><div><h1>Parents</h1><p>See how your child is doing, what to practise, and share their progress.</p></div>
+  ${parentDash()}
+  <h2>All children</h2>
   <div class="games">${S.kids.map(k=>`<div class="plan"><div class="row" style="justify-content:flex-start;gap:8px"><span class="av sm">${k.av}</span><h2>${escH(k.name)}</h2></div>
     <div class="bar"><span style="width:${Math.round(k.done.length/UNITS.length*100)}%"></span></div>
     <p>${k.done.length} of ${UNITS.length} levels · ★ ${k.stars} · 🔥 ${k.streak}-day streak</p>
@@ -1182,9 +1279,10 @@ function parents(){
    <span class="lvl">Tajwīd groups</span><ul>${TAJ.map(g=>`<li>${g.name}: ${g.rules.map(r=>r.name).join(", ")}</li>`).join("")}</ul>
    <span class="lvl">Qurʾān practice</span><p>${SURAHS.map(s=>s.n).join(", ")}</p></div>
   <div class="row" style="justify-content:flex-start"><button class="btn ghost" id="reset">Reset all progress</button></div></div>`;
+  wireDash();
   $("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
   view.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.kids=S.kids.filter(k=>k.id!==+b.dataset.del);if(!S.kids.some(k=>k.id===S.cur))S.cur=S.kids[0].id;save();header();parents()});
-  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],stickers:[],day:null,chest:20,streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
+  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],stickers:[],day:null,chest:20,log:{},miss:{},streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
 }
 
 const TABS={learn,play,parents:()=>parentGate(parents)};
