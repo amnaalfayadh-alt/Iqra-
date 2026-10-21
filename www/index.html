@@ -166,6 +166,7 @@ nav button .tn{font-size:1.05rem;line-height:1.3}nav button small{font-size:.62r
 p,.note,small{unicode-bidi:plaintext}
 .ltr{display:flex;flex-direction:column;gap:18px}
 .ltr .gcard,.ltr .plan{text-align:left}
+.snd{cursor:pointer;font-size:1rem}
 /* two paths */
 .tracks{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:6px}
 .trk{border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -216,7 +217,7 @@ nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,va
 
 <header class="top">
   <div class="brand"><span class="ar" style="font-weight:400">اقرأ</span> Steps<small class="ar">الْقَاعِدَةُ لِلصِّغَار</small></div>
-  <div class="hud"><button class="who" id="who" aria-label="Switch child"></button><span class="pill" id="streak" aria-label="Days in a row">🔥 0</span><span class="pill" id="stars" aria-label="Stars earned">★ 0</span></div>
+  <div class="hud"><button class="pill snd" id="snd" aria-label="Sound on">🔔</button><button class="who" id="who" aria-label="Switch child"></button><span class="pill" id="streak" aria-label="Days in a row">🔥 0</span><span class="pill" id="stars" aria-label="Stars earned">★ 0</span></div>
 </header>
 <main dir="rtl"><div class="wrap" id="view"></div></main>
 <nav>
@@ -419,6 +420,34 @@ function star(n=1){
 }
 const setStars=()=>star(); // kept for older calls
 
+
+/* ================= SOUND EFFECTS (made in the app, no files) ================= */
+let AC=null;
+const soundOn=()=>S.sound!==false;
+function tone(f,t,d,type="sine",vol=.18,f2){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05);
+}
+function sfx(kind){
+  if(!soundOn())return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();}catch(e){return}
+  const t=AC.currentTime+.01;
+  if(kind==="tap")tone(880,t,.06,"triangle",.05);
+  if(kind==="good"){tone(659,t,.18,"sine",.16);tone(880,t+.09,.18,"sine",.16);tone(1319,t+.18,.32,"sine",.13)}
+  if(kind==="bad"){tone(330,t,.28,"triangle",.10,220)}
+  if(kind==="win"){[523,659,784,1047].forEach((f,i)=>tone(f,t+i*.12,.35,"sine",.15));tone(1568,t+.5,.6,"sine",.08);tone(2093,t+.62,.5,"sine",.06)}
+}
+/* after any button press: cheerful if it was right, soft if not, tiny tick otherwise */
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest("button");if(!b||b.id==="snd")return;
+  if(b.classList.contains("good")||b.classList.contains("pop"))sfx("good");
+  else if(b.classList.contains("bad"))sfx("bad");
+  else sfx("tap");
+});
+function soundBtn(){const b=$("#snd");if(b){b.textContent=soundOn()?"🔔":"🔕";b.setAttribute("aria-label",soundOn()?"Sound on":"Sound off")}}
+
 /* ================= HELPERS ================= */
 const $=s=>document.querySelector(s), view=document.querySelector("#view");
 function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1600)}
@@ -502,6 +531,7 @@ function paywall(a,e){
 
 /* ================= CERTIFICATE ================= */
 function finishLevel(k){
+  sfx("win");
   const u=UNITS[k],kd=kid();
   if(!kd.done.includes(u.id))kd.done.push(u.id);star(3);
   top0();
@@ -707,6 +737,7 @@ function deckNext(key,list,round){if(round===0||!DECK[key]||DECK[key].length!==l
 const prog=(r,n)=>`<span class="lvl ar">الْحَرْف ${AN(r+1)} مِنْ ${AN(n)}</span><div class="bar"><span style="width:${Math.round(r/n*100)}%"></span></div>`;
 const ask=(a,e)=>`<div class="ask">${bi(a,e)}</div>`;
 function gameDone(id,count,again){
+  sfx("win");
   const g=G(id);star(3);top0();
   view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
   ${bi(g.a,g.name,"h")}${bi("لَعِبْتَ كُلَّ الْحُرُوف ("+AN(count)+")","You played all "+count+" letters")}
@@ -797,8 +828,8 @@ function memory(round=0){
     if(open.length===2||el.classList.contains("up"))return;
     el.classList.add("up");say(cards[j].s);open.push(j);
     if(open.length===2){const[a,b]=open;
-      if(cards[a].p===cards[b].p){setTimeout(()=>{els[a].classList.add("done");els[b].classList.add("done");open=[];found++;star();$("#mm").textContent=`${AN(found)} / ${AN(np)}`;if(found===np){toast(T.masha);$("#again").hidden=false}},400)}
-      else setTimeout(()=>{els[a].classList.remove("up");els[b].classList.remove("up");open=[]},900)}
+      if(cards[a].p===cards[b].p){setTimeout(()=>{sfx("good");els[a].classList.add("done");els[b].classList.add("done");open=[];found++;star();$("#mm").textContent=`${AN(found)} / ${AN(np)}`;if(found===np){toast(T.masha);$("#again").hidden=false}},400)}
+      else setTimeout(()=>{sfx("bad");els[a].classList.remove("up");els[b].classList.remove("up");open=[]},700)}
   });
 }
 function bounce(){
@@ -895,6 +926,7 @@ function readLesson(i){
     if(i===RL.length-1)return readCert();readLesson(i+1)};
 }
 function readCert(){
+  sfx("win");
   const kd=kid();star(3);top0();
   view.innerHTML=`<div class="cert"><div class="cert-in">
    <div class="ar cert-top">مَا شَاءَ اللَّه</div>${bi("شَهَادَةُ إِتْمَام","Certificate of completion")}
@@ -916,7 +948,7 @@ const bare=t=>t.replace(/[ً-ٰٟ]/g,"");
 function rGame(kind,round,score,upTo){
   if(upTo===undefined)upTo=rMaxLesson();
   const g=RGAMES[kind],N=8;top0();
-  if(round>=N){star(3);
+  if(round>=N){star(3);sfx("win");
     view.innerHTML=`<button class="back" id="bk">← ${bi("الأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
     ${bi(g.a,g.name,"h")}<span class="meter ar">★ ${AN(score)} / ${AN(N)}</span>
     <div class="row"><button class="btn" id="again">${bi("مَرَّةً أُخْرَى","Play again")}</button><button class="btn ghost" id="gm">${bi("الدُّرُوس","Lessons")}</button></div></div>`;
@@ -1003,6 +1035,7 @@ function parents(){
 const TABS={learn,play,parents:()=>parentGate(parents)};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-current",x===b));TABS[b.dataset.tab]()});
 $("#who").onclick=kids;
+$("#snd").onclick=()=>{S.sound=!soundOn();save();soundBtn();if(soundOn())sfx("good")};soundBtn();
 
 header();learn();
 </script>
