@@ -143,9 +143,9 @@ input{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:14px;border:
 input:focus{outline:3px solid var(--sky);outline-offset:1px}
 .curr{margin:0;padding-left:22px;line-height:1.7}
 /* Arabic-first: big Arabic, small English helper */
-.bi{display:inline-flex;flex-direction:column;align-items:center;gap:0;line-height:1.25}
-.bi .ar{font-size:1.15em}
-.bi small{font-family:var(--body);font-size:.72rem;font-weight:700;color:var(--muted);direction:ltr;unicode-bidi:isolate}
+.bi{display:inline-flex;flex-direction:column;align-items:center;gap:.4em;line-height:1.5}
+.bi .ar{font-size:1.15em;line-height:1.75;padding-bottom:.1em}
+.bi small{display:block;font-family:var(--body);font-size:.72rem;font-weight:700;line-height:1.3;color:var(--muted);direction:ltr;unicode-bidi:isolate}
 .btn .bi small{color:inherit;opacity:.72;font-size:.66rem}
 .bi.h .ar{font-size:1.65rem}
 .bi.name .ar{font-size:2.1rem}
@@ -167,6 +167,15 @@ p,.note,small{unicode-bidi:plaintext}
 .ltr{display:flex;flex-direction:column;gap:18px}
 .ltr .gcard,.ltr .plan{text-align:left}
 .snd{cursor:pointer;font-size:1rem}
+/* breathing room between Arabic and its English helper everywhere */
+.btn{line-height:1.4;padding:12px 22px}
+.btn .bi{gap:.3em}
+.chip{gap:6px;padding:12px 12px 10px}.chip .ar{line-height:1.6}.chip small{line-height:1.3;margin-top:2px}
+.step .t{display:flex;flex-direction:column;gap:4px}.step .ua{line-height:1.7}.step .en{line-height:1.3}
+.forms button{gap:6px;padding:10px 4px}.forms .fl{line-height:1.6}
+.choices .rule,.choices.rules button{gap:6px}.choices .on{line-height:1.6}
+.findme .bi{gap:.5em}
+.cert-in{gap:12px}
 /* two paths */
 .tracks{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:6px}
 .trk{border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -210,6 +219,13 @@ nav button .ar{font-size:1.5rem;line-height:1.2}
 nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,var(--sun) 35%,transparent)}
 .toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:700;padding:10px 20px;border-radius:999px;z-index:20}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* spacing fixes: keep last so they win */
+nav button{gap:6px;padding-block:8px 6px}
+nav button .ar.tn{font-size:1.1rem;line-height:1.9;display:block}
+nav button small{display:block;line-height:1.2}
+.trk{gap:6px;padding-block:12px 10px}
+.trk .ar{line-height:1.9;display:block}
+.trk small{display:block;line-height:1.2}
 </style>
 </head>
 <body>
