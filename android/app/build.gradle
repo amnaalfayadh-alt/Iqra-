@@ -18,6 +18,13 @@ android {
         }
     }
     signingConfigs {
+        // Fixed key for test builds, so a new test version installs over the old one
+        debug {
+            storeFile file("test-signing.key")
+            storePassword "iqrasteps-test"
+            keyAlias "iqrasteps-test"
+            keyPassword "iqrasteps-test"
+        }
         release {
             if (System.getenv("KEYSTORE_FILE")) {
                 storeFile file(System.getenv("KEYSTORE_FILE"))
