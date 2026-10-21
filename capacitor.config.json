@@ -1,0 +1,7 @@
+{
+  "appId": "com.iqrasteps.app",
+  "appName": "Iqra Steps",
+  "webDir": "www",
+  "backgroundColor": "#EAF6F3",
+  "android": { "allowMixedContent": false }
+}

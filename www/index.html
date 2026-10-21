@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2BA88A">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>اقرأ Steps</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Layout: one-screen kid app — top bar, scrolling view, fat bottom tab bar */
+:root{
+  --bg:#EAF6F3; --surface:#FFFFFF; --ink:#16324F; --muted:#5B7389;
+  --sun:#FFC83D; --leaf:#2BA88A; --coral:#FF7A6B; --sky:#4C8DF6; --line:#CFE5DF;
+  --display:"Baloo 2",ui-rounded,system-ui,sans-serif;
+  --body:"Nunito",system-ui,sans-serif;
+  --arabic:"Amiri Quran","Amiri","Noto Naskh Arabic","Geeza Pro",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F2233;--surface:#18324A;--ink:#EEF6FB;--muted:#9DB4C6;--line:#26455F;--sun:#FFCF52;--leaf:#3CC3A1;--coral:#FF8C7E;--sky:#6EA4FF;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F2233;--surface:#18324A;--ink:#EEF6FB;--muted:#9DB4C6;--line:#26455F;--sun:#FFCF52;--leaf:#3CC3A1;--coral:#FF8C7E;--sky:#6EA4FF;color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;display:flex;flex-direction:column}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-family:var(--display);font-weight:800;font-size:1.4rem;line-height:1}
+.brand small{display:block;font-family:var(--body);font-weight:700;font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.pill{font-family:var(--display);font-weight:700;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-variant-numeric:tabular-nums}
+main{flex:1;overflow-y:auto;padding-block:4px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:1.7rem} h2{font-size:1.25rem}
+p{margin:0;line-height:1.5;color:var(--muted)}
+.ar{font-family:var(--arabic);direction:rtl}
+/* path */
+.path{display:flex;flex-direction:column;gap:14px}
+.step{display:flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:14px;text-align:left;width:100%}
+.step .badge{flex:none;width:64px;height:64px;border-radius:20px;display:grid;place-items:center;font-size:2rem;color:#16324F}
+.step:nth-child(2n){margin-left:8%}.step:nth-child(3n){margin-left:3%}
+.step .t{min-width:0;flex:1}.step .t b{font-family:var(--display);font-size:1.1rem;display:block}
+.lvl{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lock{font-size:.8rem;font-weight:700;background:var(--bg);border-radius:999px;padding:3px 10px;color:var(--muted)}
+/* letters */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px;direction:rtl}
+.tile{background:var(--surface);border:2px solid var(--line);border-radius:18px;aspect-ratio:1;display:grid;place-items:center;font-family:var(--arabic);font-size:2.3rem;line-height:1;transition:transform .15s}
+.tile:active,.tile.on{transform:scale(.94);border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 14%,var(--surface))}
+.focus{background:var(--surface);border:2px solid var(--line);border-radius:26px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.big{font-family:var(--arabic);font-size:6rem;line-height:1.3;direction:rtl}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:var(--display);font-weight:700;font-size:1.05rem;border-radius:999px;padding:10px 20px;background:var(--sun);color:#16324F;box-shadow:0 4px 0 color-mix(in srgb,var(--sun) 60%,#000)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--sun) 60%,#000)}
+.btn.rec{background:var(--coral);box-shadow:0 4px 0 color-mix(in srgb,var(--coral) 60%,#000)}
+.btn.rec.live{animation:pulse 1s infinite}
+.btn.ghost{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.note{font-size:.85rem;color:var(--muted);max-width:42ch}
+.back{font-weight:700;color:var(--sky);align-self:flex-start;padding:4px 0}
+.harakat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.harakat button{background:var(--bg);border:2px solid var(--line);border-radius:20px;padding:8px 4px}
+.harakat .ar{font-size:3.4rem;line-height:1.4;display:block}
+.harakat small{font-weight:700;color:var(--muted)}
+.word{font-family:var(--arabic);font-size:3.2rem;direction:rtl;line-height:1.5;display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.word span{padding:0 6px;border-radius:12px;transition:background .2s}
+.word span.hi{background:color-mix(in srgb,var(--sun) 55%,transparent)}
+/* games */
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.gcard{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:8px}
+.gcard .ic{font-family:var(--arabic);font-size:2.4rem;line-height:1.2;direction:rtl}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:360px}
+.choices button{background:var(--bg);border:3px solid var(--line);border-radius:24px;aspect-ratio:1.3;font-family:var(--arabic);font-size:3rem}
+.choices button.good{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 22%,var(--surface))}
+.choices button.bad{border-color:var(--coral);animation:shake .3s}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+.choices.three button{font-family:var(--display);font-size:1.3rem;aspect-ratio:1}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.meter{font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums}
+.bubbles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;max-width:380px;direction:rtl}
+.bubbles button{aspect-ratio:1;border-radius:50%;background:var(--bg);border:3px solid var(--line);font-family:var(--arabic);font-size:2rem}
+.bubbles button.pop{border-color:var(--leaf);background:var(--leaf);color:#fff;transform:scale(.9)}
+.playbar{background:var(--ink);color:var(--bg);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.playbar p{color:color-mix(in srgb,var(--bg) 75%,transparent)}
+.chips{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:96px;border-radius:18px;padding:10px 12px;font-family:var(--display);font-weight:700;color:#16324F}
+.chip .ar{font-size:1.6rem;line-height:1.3}
+.gic{display:inline-grid;place-items:center;min-width:64px;height:56px;padding:0 12px;border-radius:16px;font-size:1.7rem;line-height:1;color:#16324F;align-self:flex-start}
+.choices .rule{aspect-ratio:auto;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.9rem}
+.choices .rule small{font-family:var(--display);font-size:1rem;color:var(--muted)}
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:400px}
+.card{aspect-ratio:.8;border-radius:16px;background:var(--sky);border:3px solid var(--sky);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.3rem;transition:transform .2s}
+.card span{visibility:hidden}
+.card.arc{font-family:var(--arabic);font-weight:400;font-size:2.2rem}
+.card.up{background:var(--surface);transform:rotateY(180deg) scaleX(-1)}
+.card.up span{visibility:visible}
+.card.done{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 22%,var(--surface))}
+.forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;width:100%}
+.forms button{background:var(--bg);border:2px solid var(--line);border-radius:20px;padding:8px 4px;display:flex;flex-direction:column;align-items:center}
+.forms .ar{font-size:3.2rem;line-height:1.5}
+.forms small{font-weight:700;color:var(--muted)}
+.tile.sm{font-size:1.7rem;border-radius:14px}
+.grid:has(.sm){grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px}
+.chips.tabs{width:100%}
+.chip.sm{min-width:0;flex-direction:row;padding:6px 14px;background:var(--surface);border:2px solid var(--line);color:var(--ink)}
+.chip.sm .ar{font-size:1.3rem}
+.chip.sm.on{background:var(--sun);border-color:var(--sun);color:#16324F}
+.lock.free{background:color-mix(in srgb,var(--leaf) 20%,transparent);color:var(--ink)}
+.choices.rules button{aspect-ratio:auto;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.8rem;line-height:1.4}
+.choices.rules small{font-family:var(--display);font-size:.95rem;color:var(--muted);line-height:1.2}
+.mk{font-size:2.4rem}
+.hud{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.who{display:flex;align-items:center;gap:4px;font-family:var(--display);font-weight:700;background:var(--sun);color:#16324F;border-radius:999px;padding:4px 12px 4px 6px;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{font-size:1.2rem}
+@media (max-width:420px){.brand small{display:none}.pill{padding:4px 8px}}
+.bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar span{display:block;height:100%;background:var(--leaf);border-radius:999px}
+.step.done{border-color:var(--leaf)}
+.big.mid{font-size:3.6rem}
+.sign{font-family:var(--arabic);font-size:1.2em;color:var(--coral)}
+.tile.wide{aspect-ratio:auto;padding:6px 8px;font-size:1.4rem;line-height:1.6}
+.grid:has(.wide){grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}
+.mushaf{border-color:var(--sun);border-width:3px}
+.ayat{display:flex;flex-direction:column;gap:6px;width:100%}
+.ayah{font-family:var(--arabic);direction:rtl;text-align:right;font-size:1.8rem;line-height:2.1;padding:6px 12px;border-radius:14px}
+.ayah.hi{background:color-mix(in srgb,var(--sun) 40%,transparent)}
+.ayah.basm{text-align:center;font-size:1.6rem}
+.num{color:var(--leaf);font-size:.85em}
+.choices .num{font-family:var(--display);font-weight:800;font-size:2rem;aspect-ratio:auto;padding:16px}
+.findme{font-family:var(--display);font-weight:800;font-size:2.4rem;line-height:1;color:var(--leaf)}
+.choices.small button{font-size:2.4rem;line-height:1.5}
+.choices.wide{grid-template-columns:repeat(3,1fr);max-width:400px}
+.cert{background:var(--sun);border-radius:28px;padding:10px}
+.cert-in{background:var(--surface);border:3px dashed var(--sun);border-radius:20px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.cert-top{font-size:2.4rem;color:var(--leaf)}
+.cert h1{font-size:2.2rem}
+.cert-stars{font-size:2rem;color:var(--sun);letter-spacing:.2em}
+.kidcard{align-items:center;text-align:center}
+.kidcard.on{border-color:var(--leaf);border-width:3px}
+.av{font-size:2.6rem;line-height:1}
+.av.sm{font-size:1.6rem}
+.avpick{font-size:1.7rem;width:48px;height:48px;border-radius:14px;border:2px solid var(--line);background:var(--bg)}
+.avpick.on{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 20%,var(--surface))}
+input{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+input:focus{outline:3px solid var(--sky);outline-offset:1px}
+.curr{margin:0;padding-left:22px;line-height:1.7}
+/* Arabic-first: big Arabic, small English helper */
+.bi{display:inline-flex;flex-direction:column;align-items:center;gap:0;line-height:1.25}
+.bi .ar{font-size:1.15em}
+.bi small{font-family:var(--body);font-size:.72rem;font-weight:700;color:var(--muted);direction:ltr;unicode-bidi:isolate}
+.btn .bi small{color:inherit;opacity:.72;font-size:.66rem}
+.bi.h .ar{font-size:1.65rem}
+.bi.name .ar{font-size:2.1rem}
+.bi.title{align-items:flex-start}.bi.title .ar{font-size:2.3rem;line-height:1.4}.bi.title small{font-size:.85rem}
+.ask .ar{font-size:1.5rem}
+.findme{font-weight:400}.findme .ar{font-size:2.6rem;color:var(--leaf);line-height:1.5}.findme small{font-size:1rem}
+.fb{font-size:1.5rem;color:var(--leaf);min-height:1.5em}
+.pa{font-size:1.15rem;color:var(--muted)}
+.ua{display:block;font-size:1.45rem;font-weight:400;line-height:1.5}
+.step .en,.gcard small,.rule small{font-family:var(--body);font-size:.78rem;font-weight:700;color:var(--muted)}
+.step,.gcard{text-align:start}
+.gcard .bi{align-items:flex-start}
+.forms .fl{font-size:1.05rem;color:var(--ink);line-height:1.4}
+.choices .on{font-size:1.25rem;color:var(--ink);line-height:1.4}
+.card.nm{font-size:1.45rem}
+.chip .cn{font-size:1rem;line-height:1.4}.chip small{font-family:var(--body);font-size:.62rem;opacity:.8}
+nav button .tn{font-size:1.05rem;line-height:1.3}nav button small{font-size:.62rem;font-family:var(--body)}
+p,.note,small{unicode-bidi:plaintext}
+.ltr{display:flex;flex-direction:column;gap:18px}
+.ltr .gcard,.ltr .plan{text-align:left}
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.plan{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.plan.best{border-color:var(--leaf);border-width:3px}
+.price{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1}
+.price small{font-size:.9rem;color:var(--muted);font-weight:500}
+.plan ul{margin:0;padding-left:18px;line-height:1.6}
+.tag{align-self:flex-start;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--leaf);color:#fff;border-radius:999px;padding:3px 10px}
+/* tabs */
+nav{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:2px solid var(--line);padding-block:6px calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav button{font-family:var(--display);font-weight:700;padding:8px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted)}
+nav button .ar{font-size:1.5rem;line-height:1.2}
+nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,var(--sun) 35%,transparent)}
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:700;padding:10px 20px;border-radius:999px;z-index:20}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="brand"><span class="ar" style="font-weight:400">اقرأ</span> Steps<small class="ar">الْقَاعِدَةُ لِلصِّغَار</small></div>
+  <div class="hud"><button class="who" id="who" aria-label="Switch child"></button><span class="pill" id="streak" aria-label="Days in a row">🔥 0</span><span class="pill" id="stars" aria-label="Stars earned">★ 0</span></div>
+</header>
+<main dir="rtl"><div class="wrap" id="view"></div></main>
+<nav>
+  <button data-tab="learn" aria-current="true"><span>📖</span><span class="ar tn">تَعَلَّمْ</span><small>Learn</small></button>
+  <button data-tab="play"><span>🎮</span><span class="ar tn">الْأَلْعَاب</span><small>Games</small></button>
+  <button data-tab="parents"><span>👪</span><span class="ar tn">الْوَالِدَان</span><small>Parents</small></button>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ================= LETTERS & MARKS ================= */
+const L=[["ا","Alif","أَلِف"],["ب","Ba","بَاء"],["ت","Ta","تَاء"],["ث","Tha","ثَاء"],["ج","Jeem","جِيم"],["ح","Ḥa","حَاء"],["خ","Kha","خَاء"],["د","Dal","دَال"],["ذ","Dhal","ذَال"],["ر","Ra","رَاء"],["ز","Zay","زَاي"],["س","Seen","سِين"],["ش","Sheen","شِين"],["ص","Ṣad","صَاد"],["ض","Ḍad","ضَاد"],["ط","Ṭa","طَاء"],["ظ","Ẓa","ظَاء"],["ع","ʿAyn","عَيْن"],["غ","Ghayn","غَيْن"],["ف","Fa","فَاء"],["ق","Qaf","قَاف"],["ك","Kaf","كَاف"],["ل","Lam","لَام"],["م","Meem","مِيم"],["ن","Noon","نُون"],["ه","Ha","هَاء"],["و","Waw","وَاو"],["ي","Ya","يَاء"]];
+const ALL=L.map(l=>l[0]);
+const NAME=c=>L[ALL.indexOf(c)]||["","",""];
+const TR={ا:"ʾ",ب:"b",ت:"t",ث:"th",ج:"j",ح:"ḥ",خ:"kh",د:"d",ذ:"dh",ر:"r",ز:"z",س:"s",ش:"sh",ص:"ṣ",ض:"ḍ",ط:"ṭ",ظ:"ẓ",ع:"ʿ",غ:"gh",ف:"f",ق:"q",ك:"k",ل:"l",م:"m",ن:"n",ه:"h",و:"w",ي:"y",ء:"ʾ"};
+const NOJOIN="ادذرزو";
+const base=c=>c==="ا"?"أ":c;
+const hamz=c=>c==="ا"?"ء":c;
+const without=s=>ALL.filter(c=>!s.includes(c));
+const COLS=["var(--sun)","var(--leaf)","var(--coral)","var(--sky)"];
+
+const MARKS=[
+ {n:"Fatḥa",m:"َ",f:c=>base(c)+"َ",t:c=>TR[c]+"a"},
+ {n:"Kasra",m:"ِ",f:c=>(c==="ا"?"إ":c)+"ِ",t:c=>TR[c]+"i"},
+ {n:"Ḍamma",m:"ُ",f:c=>base(c)+"ُ",t:c=>TR[c]+"u"},
+ {n:"Fatḥatān",m:"ً",f:c=>c==="ا"?"ءً":c+"ًا",t:c=>TR[c]+"an"},
+ {n:"Kasratān",m:"ٍ",f:c=>hamz(c)+"ٍ",t:c=>TR[c]+"in"},
+ {n:"Ḍammatān",m:"ٌ",f:c=>hamz(c)+"ٌ",t:c=>TR[c]+"un"},
+ {n:"Sukūn",m:"ْ",f:c=>"أَ"+c+"ْ",t:c=>"a"+TR[c],noAlif:true},
+ {n:"Shadda",m:"ّ",f:c=>"أَ"+c+"َّ",t:c=>"a"+TR[c]+TR[c]+"a",noAlif:true},
+];
+const MADD=[
+ {n:"Alif madd",f:c=>c==="ا"?"آ":c+"َا",t:c=>TR[c]+"ā"},
+ {n:"Yāʾ madd",f:c=>(c==="ا"?"إ":c)+"ِي",t:c=>TR[c]+"ī"},
+ {n:"Wāw madd",f:c=>base(c)+"ُو",t:c=>TR[c]+"ū"},
+];
+const LEEN=[
+ {n:"Wāw līn",f:c=>base(c)+"َوْ",t:c=>TR[c]+"aw"},
+ {n:"Yāʾ līn",f:c=>base(c)+"َيْ",t:c=>TR[c]+"ay"},
+];
+
+/* ================= ITEM LESSONS ================= */
+const JOINED="لا بت تث جح حخ خد ذر زس سش شص صض ضط طظ ظع عغ غف فق قك كل لم من نه هو وي يب بن تي".split(" ").map(p=>({
+  big:p,title:[...p].map(c=>NAME(c)[1]).join(" + "),sub:[...p].join(" + "),read:[...p].map(c=>NAME(c)[2]).join(" ، "),
+  note:[...p].some(c=>NOJOIN.includes(c))?"Watch out: ا د ذ ر ز و never hold hands with the next letter.":"Say each letter's name, then find where they hold hands."}));
+const MUQ=[
+ ["الٓمٓ","أَلِفْ لَآمْ مِيمْ","Al-Baqarah, Āl ʿImrān and 4 more"],["الٓمٓصٓ","أَلِفْ لَآمْ مِيمْ صَآدْ","Al-Aʿrāf"],["الٓر","أَلِفْ لَآمْ رَا","Yūnus, Hūd, Yūsuf, Ibrāhīm, Al-Ḥijr"],["الٓمٓر","أَلِفْ لَآمْ مِيمْ رَا","Ar-Raʿd"],
+ ["كٓهيعٓصٓ","كَافْ هَا يَا عَيْنْ صَآدْ","Maryam"],["طه","طَا هَا","Ṭā Hā"],["طسٓمٓ","طَا سِينْ مِيمْ","Ash-Shuʿarāʾ, Al-Qaṣaṣ"],["طسٓ","طَا سِينْ","An-Naml"],
+ ["يسٓ","يَا سِينْ","Yā Sīn"],["صٓ","صَآدْ","Ṣād"],["حمٓ","حَا مِيمْ","7 sūrahs, Ghāfir to Al-Aḥqāf"],["حمٓ عٓسٓقٓ","حَا مِيمْ عَيْنْ سِينْ قَآفْ","Ash-Shūrā"],["قٓ","قَآفْ","Qāf"],["نٓ","نُونْ","Al-Qalam"],
+].map(([big,read,s])=>({big,title:"Read: "+read,sub:"Opens "+s,read,ar:true,note:"Read each letter by its name. Names with 3 sounds (مِيمْ، لَآمْ) stretch 6 counts. Names with 2 sounds (طَا، هَا، رَا) stretch 2 counts."}));
+const SMALL=[
+ {big:"ـٰ",title:"Standing fatḥa",sub:"A little alif on top. Read it like a long ā, 2 counts.",ex:["هَٰذَا","الرَّحْمَٰنِ","ذَٰلِكَ"]},
+ {big:"ـۥ",title:"Small wāw",sub:"After هُ, stretch the u for 2 counts.",ex:["لَهُۥ","إِنَّهُۥ","رَبَّهُۥ"]},
+ {big:"ـۦ",title:"Small yāʾ",sub:"After هِ, stretch the i for 2 counts.",ex:["بِهِۦ","رَبِّهِۦ","فِيهِۦ"]},
+ {big:"ـٓ",title:"Maddah",sub:"The wavy line means stretch longer: 4 to 6 counts.",ex:["جَآءَ","السَّمَآءِ","وَلَا الضَّآلِّينَ"]},
+];
+const SILENT=[
+ {big:"ٱ",title:"Hamzat al-waṣl",sub:"Read it when you start with it. Skip it when you join from the word before.",ex:["ٱهْدِنَا","ٱلْحَمْدُ","وَٱلْعَصْرِ"]},
+ {big:"ـُوا",title:"Silent alif after wāw",sub:"The alif after وا at the end of a verb is not read.",ex:["قَالُوا","ءَامَنُوا","عَمِلُوا"]},
+ {big:"أَنَا",title:"Short alif in أَنَا",sub:"Read 'ana' short when you keep going. Stretch only when you stop.",ex:["أَنَا","لَٰكِنَّا"]},
+ {big:"أُولَٰ",title:"Silent wāw",sub:"In أُولَٰئِكَ the wāw is written but not read.",ex:["أُولَٰئِكَ","أُولُوا"]},
+ {big:"مِائَة",title:"Silent alif in مِائَة",sub:"Read it 'mi-ah'. The alif is not read.",ex:["مِائَةَ","مِائَتَيْنِ"]},
+];
+const WAQF=[
+ {big:"مـ",sign:"ۘ",title:"Must stop",sub:"Lāzim: you must stop here, or the meaning changes.",ex:["Look for a small م above the line"]},
+ {big:"لا",sign:"ۙ",title:"Don't stop here",sub:"Keep reading. Don't stop at this sign.",ex:["Small لا above the line"]},
+ {big:"ج",sign:"ۚ",title:"Stopping is allowed",sub:"Jāʾiz: stopping or continuing are both fine.",ex:["Small ج above the line"]},
+ {big:"صلى",sign:"ۖ",title:"Better to continue",sub:"You may stop, but continuing is better.",ex:["Small صلى above the line"]},
+ {big:"قلى",sign:"ۗ",title:"Better to stop",sub:"You may continue, but stopping is better.",ex:["Small قلى above the line"]},
+ {big:"∴ ∴",sign:"ۛ",title:"Stop at one, not both",sub:"Two sets of 3 dots: stop at one of them only.",ex:["Seen in ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ"]},
+ {big:"۝",sign:"۝",title:"End of an āyah",sub:"The circle ends a verse. A good place to stop and breathe.",ex:["The number inside tells you which āyah it is"]},
+];
+const SURAHS=[
+ {n:"Al-Fātiḥah",ar:"الْفَاتِحَة",a:["بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ","الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ","الرَّحْمَٰنِ الرَّحِيمِ","مَالِكِ يَوْمِ الدِّينِ","إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ","اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ","صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"]},
+ {n:"Al-ʿAṣr",ar:"الْعَصْر",a:["وَالْعَصْرِ","إِنَّ الْإِنسَانَ لَفِي خُسْرٍ","إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ"]},
+ {n:"Al-Kawthar",ar:"الْكَوْثَر",a:["إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ","فَصَلِّ لِرَبِّكَ وَانْحَرْ","إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ"]},
+ {n:"Al-Ikhlāṣ",ar:"الْإِخْلَاص",a:["قُلْ هُوَ اللَّهُ أَحَدٌ","اللَّهُ الصَّمَدُ","لَمْ يَلِدْ وَلَمْ يُولَدْ","وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ"]},
+ {n:"Al-Falaq",ar:"الْفَلَق",a:["قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ","مِن شَرِّ مَا خَلَقَ","وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ","وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ","وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ"]},
+ {n:"An-Nās",ar:"النَّاس",a:["قُلْ أَعُوذُ بِرَبِّ النَّاسِ","مَلِكِ النَّاسِ","إِلَٰهِ النَّاسِ","مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ","الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ","مِنَ الْجِنَّةِ وَالنَّاسِ"]},
+];
+const ARNUM=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
+
+const UNITS=[
+ {id:"letters",name:"Alif Ba Ta",sub:"All 28 letters and their names",ic:"ا ب",free:true},
+ {id:"shapes",name:"Letter shapes",sub:"Each letter at the start, middle and end",ic:"ـبـ",free:true},
+ {id:"joined",name:"Joined letters",sub:"Two letters holding hands: لا  بت  جح",ic:"لا",items:JOINED,free:true},
+ {id:"muqattaat",name:"Ḥurūf muqaṭṭaʿāt",sub:"The mystery letters: الٓمٓ  يسٓ  حمٓ",ic:"الٓمٓ",items:MUQ,free:true},
+ {id:"harakat",name:"Harakat",sub:"Fatḥa, kasra, ḍamma on every letter",ic:"بَ",forms:MARKS.slice(0,3),free:true},
+ {id:"tanween",name:"Tanwīn",sub:"Double harakat: an, in, un",ic:"بٌ",forms:MARKS.slice(3,6)},
+ {id:"small",name:"Small letters & maddah",sub:"ـٰ  ـۥ  ـۦ  ـٓ",ic:"ـٰ",items:SMALL},
+ {id:"madd",name:"Long letters",sub:"ا  ي  و stretch the sound 2 counts",ic:"بَا",forms:MADD},
+ {id:"leen",name:"Līn letters",sub:"Soft وْ and يْ after fatḥa: aw, ay",ic:"بَيْ",forms:LEEN,noAlif:true},
+ {id:"sukoon",name:"Sukūn",sub:"Stop on the letter",ic:"أَبْ",forms:[{n:"After fatḥa",f:c=>"أَ"+c+"ْ",t:c=>"a"+TR[c]},{n:"After kasra",f:c=>"إِ"+c+"ْ",t:c=>"i"+TR[c]},{n:"After ḍamma",f:c=>"أُ"+c+"ْ",t:c=>"u"+TR[c]}],noAlif:true},
+ {id:"shadda",name:"Shadda",sub:"Say the letter twice",ic:"بّ",forms:[{n:"With fatḥa",f:c=>"أَ"+c+"َّ",t:c=>"a"+TR[c]+TR[c]+"a"},{n:"With kasra",f:c=>"أَ"+c+"ِّ",t:c=>"a"+TR[c]+TR[c]+"i"},{n:"With ḍamma",f:c=>"أَ"+c+"ُّ",t:c=>"a"+TR[c]+TR[c]+"u"},{n:"With tanwīn",f:c=>"أَ"+c+"ٌّ",t:c=>"a"+TR[c]+TR[c]+"un"}],noAlif:true},
+ {id:"silent",name:"Silent letters",sub:"Hamzat al-waṣl and letters we don't read",ic:"ٱ",items:SILENT},
+ {id:"waqf",name:"Stop signs",sub:"Where to stop and where to keep going",ic:"ۘ",items:WAQF},
+ {id:"reading",name:"Reading words",sub:"Put it all together",ic:"كَتَبَ"},
+ {id:"tajweed",name:"Tajwīd for kids",sub:"Makhārij and the aḥkām",ic:"نْ"},
+ {id:"quran",name:"Qurʾān practice",sub:"Al-Fātiḥah and short sūrahs",ic:"۝"},
+];
+const UID=id=>UNITS.findIndex(u=>u.id===id);
+const WORDS=[
+ {g:"Harakat",w:[["أَ","خَ","ذَ"],["كَ","تَ","بَ"],["ذَ","هَ","بَ"],["جَ","لَ","سَ"],["خَ","لَ","قَ"],["نَ","صَ","رَ"],["فَ","تَ","حَ"],["قَ","رَ","أَ"],["سَ","مِ","عَ"],["حَ","سِ","بَ"],["كَ","رُ","مَ"],["عَ","لِ","مَ"]]},
+ {g:"Tanwīn",w:[["أَ","حَ","دٌ"],["قَ","لَ","مٌ"],["وَ","لَ","دًا"],["سَ","فَ","رٍ"]]},
+ {g:"Long letters",w:[["قَا","لَ"],["قِي","لَ"],["يَ","قُو","لُ"],["نُو","رٌ"],["كِ","تَا","بٌ"]]},
+ {g:"Līn",w:[["خَوْ","فٌ"],["بَيْ","تٌ"],["قُ","رَيْ","شٍ"],["يَوْ","مٌ"]]},
+ {g:"Sukūn",w:[["قُلْ"],["لَمْ","يَ","لِدْ"],["أَنْ","عَمْ","تَ"],["يَخْ","لُقْ"]]},
+ {g:"Shadda",w:[["رَ","بِّ"],["إِ","نَّ"],["ثُ","مَّ"],["مُ","حَمَّ","دٌ"]]},
+];
+
+/* ================= TAJWID ================= */
+const HEAVY="خصضغطقظ";
+const TAJ=[
+ {name:"Makhārij: where sounds come from",ar:"مَخَارِجُ الْحُرُوف",ic:"👄",ask:"Where does this letter come from?",
+  intro:"Every letter has a home in your mouth. Touch your throat, tongue and lips as you say them.",p:c=>c,
+  rules:[
+   {name:"Throat",ar:"الْحَلْق",kid:"Deep in your throat. Put your hand on your neck!",tip:"ء ه ع ح غ خ",letters:"ء ه ع ح غ خ".split(" "),ex:["أَ","عَ","خَ"]},
+   {name:"Tongue",ar:"اللِّسَان",kid:"Your tongue touches your teeth or the roof of your mouth.",tip:"18 letters",letters:"ق ك ج ش ي ض ل ن ر ط د ت ص ز س ظ ذ ث".split(" "),ex:["تَ","ثَ","لَ"]},
+   {name:"Lips",ar:"الشَّفَتَان",kid:"Your lips close or touch your teeth.",tip:"ف و ب م",letters:"ف و ب م".split(" "),ex:["بَ","مَ","فَ"]},
+   {name:"Nose",ar:"الْخَيْشُوم",kid:"The hum of ghunnah comes out of your nose. Pinch it and see!",tip:"Ghunnah of ن and م",ex:["نّ","مّ","إِنَّ"]},
+   {name:"Open mouth",ar:"الْجَوْف",kid:"Madd letters fly out of the empty space in your mouth.",tip:"ا و ي as madd",letters:["ا"],ex:["قَالَ","قِيلَ","يَقُولُ"]},
+  ]},
+ {name:"Noon sākinah & tanwīn",ar:"النُّونُ السَّاكِنَة",ic:"نْ",ask:"Look at the letter after نْ",
+  intro:"When you see نْ or tanwīn, the next letter tells you what to do.",p:c=>"نْ  "+c,
+  rules:[
+   {name:"Iẓhār",ar:"إِظْهَار",kid:"Say the noon clearly. No humming!",tip:"6 throat letters",letters:"ء ه ع ح غ خ".split(" "),ex:["مِنْ هَادٍ","مَنْ آمَنَ","مِنْ عِلْمٍ"]},
+   {name:"Idghām",ar:"إِدْغَام",kid:"The noon jumps inside the next letter.",tip:"Remember يَرْمَلُونَ",letters:"ي ر م ل و ن".split(" "),ex:["مَن يَقُولُ","مِن رَّبِّهِمْ","مِن مَّاءٍ"]},
+   {name:"Iqlāb",ar:"إِقْلَاب",kid:"Before ب the noon turns into a soft م hum.",tip:"Only one letter: ب",letters:["ب"],ex:["مِنۢ بَعْدِ","أَنۢبِئْهُم"]},
+   {name:"Ikhfāʾ",ar:"إِخْفَاء",kid:"Hide the noon with a gentle hum in your nose.",tip:"The other 15 letters",letters:"ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك".split(" "),ex:["مِن قَبْلِ","أَنتُمْ","مَن ذَا"]},
+  ]},
+ {name:"Meem sākinah",ar:"الْمِيمُ السَّاكِنَة",ic:"مْ",ask:"Look at the letter after مْ",
+  intro:"When you see مْ, check the next letter.",p:c=>"مْ  "+c,
+  rules:[
+   {name:"Ikhfāʾ shafawī",ar:"إِخْفَاء شَفَوِي",kid:"Lips close softly and hum before ب.",tip:"Only ب",letters:["ب"],ex:["تَرْمِيهِم بِحِجَارَةٍ","وَهُم بِالْآخِرَةِ"]},
+   {name:"Idghām shafawī",ar:"إِدْغَام شَفَوِي",kid:"Two meems join into one with a hum.",tip:"Only م",letters:["م"],ex:["لَهُم مَّا","كُنتُم مُّؤْمِنِينَ"]},
+   {name:"Iẓhār shafawī",ar:"إِظْهَار شَفَوِي",kid:"Say the meem clearly, no hum.",tip:"All the other letters",letters:without("بم").map(hamz),ex:["أَمْ لَمْ","هُمْ فِيهَا","عَلَيْهِمْ وَلَا"]},
+  ]},
+ {name:"Ghunnah",ar:"الْغُنَّة",ic:"نّ",ask:"Does this letter hum?",
+  intro:"Noon and meem with shadda always hum through the nose for 2 counts.",p:c=>c+"ّ",
+  rules:[
+   {name:"Ghunnah",ar:"غُنَّة",kid:"Hum for 2 counts: نّ and مّ.",tip:"Only ن and م",letters:["ن","م"],ex:["إِنَّ","ثُمَّ","مِنَ الْجِنَّةِ"]},
+   {name:"No ghunnah",ar:"بِلَا غُنَّة",kid:"Say it twice, but no hum.",tip:"Every other letter",letters:without("انم"),ex:["رَبِّ","الصَّلَاةَ"]},
+  ]},
+ {name:"Qalqalah",ar:"الْقَلْقَلَة",ic:"قْ",ask:"Does it bounce when it has sukūn?",
+  intro:"Five letters bounce when they have sukūn: قُطْبُ جَدٍّ",p:c=>c+"ْ",
+  rules:[
+   {name:"Qalqalah",ar:"قَلْقَلَة",kid:"Bounce the sound! A little echo.",tip:"قُطْبُ جَدٍّ",letters:"ق ط ب ج د".split(" "),ex:["أَحَدْ","الْفَلَقْ","يَدْعُو","أَطْعَمَهُم"]},
+   {name:"No bounce",ar:"بِلَا قَلْقَلَة",kid:"Stop still. No bounce.",tip:"All other letters",letters:without("اقطبجد"),ex:["يَسْمَعُونَ","أَنْعَمْتَ"]},
+  ]},
+ {name:"Lām shamsiyyah & qamariyyah",ar:"اللَّامُ الشَّمْسِيَّة وَالْقَمَرِيَّة",ic:"ال",ask:"Do we say the ل in ال?",
+  intro:"Sun letters hide the ل. Moon letters let you hear it.",p:c=>"ال"+base(c),
+  rules:[
+   {name:"Qamariyyah (moon)",ar:"قَمَرِيَّة",kid:"Say the ل clearly: al-qamar.",tip:"Remember ابْغِ حَجَّكَ وَخَفْ عَقِيمَهُ",letters:"ا ب غ ح ج ك و خ ف ع ق ي م ه".split(" "),ex:["الْقَمَرُ","الْحَمْدُ","الْكِتَابُ"]},
+   {name:"Shamsiyyah (sun)",ar:"شَمْسِيَّة",kid:"Hide the ل and double the next letter: ash-shams.",tip:"The other 14 letters",letters:"ت ث د ذ ر ز س ش ص ض ط ظ ل ن".split(" "),ex:["الشَّمْسُ","الرَّحْمَٰنِ","النَّاسِ"]},
+  ]},
+ {name:"Heavy & light letters",ar:"التَّفْخِيمُ وَالتَّرْقِيق",ic:"ق",ask:"Is this letter heavy or light?",
+  intro:"Heavy letters fill your mouth. Light letters are thin and soft.",p:c=>c+"َ",
+  rules:[
+   {name:"Heavy (tafkhīm)",ar:"تَفْخِيم",kid:"Big round sound, like a lion.",tip:"Remember خُصَّ ضَغْطٍ قِظْ",letters:HEAVY.split(""),ex:["قَالَ","الصِّرَاطَ","خَلَقَ"]},
+   {name:"Light (tarqīq)",ar:"تَرْقِيق",kid:"Thin, small sound, like a bird.",tip:"Most other letters",letters:without(HEAVY+"ارل"),ex:["بِسْمِ","تَبَّتْ","سَمِيعٌ"]},
+  ]},
+ {name:"The letter Rāʾ",ar:"أَحْكَامُ الرَّاء",ic:"ر",ask:"Is this rāʾ heavy or light?",
+  intro:"Rāʾ changes! Look at its haraka, or the haraka before it.",p:null,
+  rules:[
+   {name:"Heavy rāʾ",ar:"رَاء مُفَخَّمَة",kid:"With fatḥa or ḍamma, or sukūn after them: big sound.",tip:"رَ  رُ  َرْ  ُرْ",ex:["رَبِّ","رُسُلُ","مَرْيَمَ","الْقُرْآنُ"]},
+   {name:"Light rāʾ",ar:"رَاء مُرَقَّقَة",kid:"With kasra, or sukūn after kasra: thin sound.",tip:"رِ  ِرْ",ex:["رِزْقًا","فِرْعَوْنَ","رِجَالٌ","مِرْيَةٍ"]},
+  ]},
+ {name:"Lām in Allah's name",ar:"لَامُ لَفْظِ الْجَلَالَة",ic:"الله",ask:"Heavy or light lām in اللَّه?",
+  intro:"Look at the sound just before اللَّه.",p:null,
+  rules:[
+   {name:"Heavy lām",ar:"تَفْخِيم",kid:"After fatḥa or ḍamma, say it big: Allāh.",tip:"After a or u",ex:["قَالَ اللَّهُ","رُسُلُ اللَّهِ","نَصْرُ اللَّهِ","هُوَ اللَّهُ"]},
+   {name:"Light lām",ar:"تَرْقِيق",kid:"After kasra, say it thin: bismillāh.",tip:"After i",ex:["بِسْمِ اللَّهِ","لِلَّهِ","بِاللَّهِ","عَبْدِ اللَّهِ"]},
+  ]},
+ {name:"Madd (stretching)",ar:"الْمُدُود",ic:"آ",ask:"How long do we stretch it?",
+  intro:"Madd letters ا و ي stretch the sound. Count on your fingers!",p:null,
+  rules:[
+   {name:"Madd ṭabīʿī · 2",ar:"مَدّ طَبِيعِي",kid:"Normal stretch: 2 counts.",tip:"No hamza or sukūn after it",ex:["قَالَ","قِيلَ","يَقُولُ","نُوحِيهَا"]},
+   {name:"Madd muttaṣil · 4–5",ar:"مَدّ مُتَّصِل",kid:"Hamza in the same word: 4 or 5 counts.",tip:"ء in the same word",ex:["جَاءَ","السَّمَاءِ","سُوءَ"]},
+   {name:"Madd munfaṣil · 4–5",ar:"مَدّ مُنْفَصِل",kid:"Hamza starts the next word: 4 or 5 counts.",tip:"ء in the next word",ex:["بِمَا أُنزِلَ","يَا أَيُّهَا","قُوا أَنفُسَكُمْ"]},
+   {name:"Madd lāzim · 6",ar:"مَدّ لَازِم",kid:"Shadda or sukūn after it: the longest, 6 counts!",tip:"Always 6",ex:["الضَّالِّينَ","الْحَاقَّةُ","دَابَّةٍ"]},
+   {name:"Madd ʿāriḍ · 2–6",ar:"مَدّ عَارِض",kid:"When you stop at the end of an āyah.",tip:"Only when stopping",ex:["الْعَالَمِينْ","نَسْتَعِينْ","الرَّحِيمْ"]},
+  ]},
+];
+const RULE_COUNT=TAJ.reduce((n,g)=>n+g.rules.length,0);
+
+/* ================= STATE: children, stars, streaks, membership ================= */
+const AVATARS=["🌙","⭐","🌸","🦁","🐢","🚀","🐪","🌴"];
+const today=()=>new Date().toISOString().slice(0,10);
+let S={kids:[{id:1,name:"Little reader",av:"🌙",stars:0,done:[],streak:0,last:""}],cur:1,member:false};
+try{const s=JSON.parse(localStorage.getItem("iqraState")||"null");if(s&&s.kids&&s.kids.length)S=s}catch(e){}
+const save=()=>{try{localStorage.setItem("iqraState",JSON.stringify(S))}catch(e){}};
+const kid=()=>S.kids.find(k=>k.id===S.cur)||S.kids[0];
+const escH=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const esc=escH;
+function header(){const k=kid();$("#who").innerHTML=`<span>${k.av}</span>${escH(k.name)}`;$("#stars").textContent=`★ ${ARNUM(k.stars)}`;$("#streak").textContent=`🔥 ${ARNUM(k.streak)}`}
+function star(n=1){
+  const k=kid();k.stars+=n;const t=today();
+  if(k.last!==t){const y=new Date(Date.now()-864e5).toISOString().slice(0,10);k.streak=k.last===y?k.streak+1:1;k.last=t;if(k.streak>1)toast(`🔥 ${ARNUM(k.streak)} أَيَّامٍ مُتَتَالِيَة`)}
+  save();header();
+}
+const setStars=()=>star(); // kept for older calls
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s), view=document.querySelector("#view");
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1600)}
+/* Real qari recordings go in AUDIO: { "بَ": "audio/ba.mp3", ... }. Anything missing falls back to the device voice. */
+/* Qari recordings go here, e.g. { "بَ": "audio/ba.m4a" }. Until then, nothing plays. */
+const AUDIO={};
+const hasAudio=()=>Object.keys(AUDIO).length>0;
+let curAudio=null;
+function say(text){
+  if(!AUDIO[text])return false;
+  try{if(curAudio)curAudio.pause();curAudio=new Audio(AUDIO[text]);curAudio.play().catch(()=>{})}catch(e){}
+  return true;
+}
+function tapSay(text){say(text)}
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function wireSay(){view.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>tapSay(b.dataset.say))}
+let rec=null,chunks=[],lastURL=null;
+async function toggleRec(btn,playBtn,note){
+  if(rec&&rec.state==="recording"){rec.stop();return}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    rec=new MediaRecorder(stream);chunks=[];
+    rec.ondataavailable=e=>chunks.push(e.data);
+    rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());btn.classList.remove("live");btn.innerHTML=bi("🎙 اقْرَأْ","Say it");
+      if(lastURL)URL.revokeObjectURL(lastURL);lastURL=URL.createObjectURL(new Blob(chunks));playBtn.hidden=false;note.innerHTML=bi("اسْتَمِعْ إِلَى صَوْتِكَ","Listen to yourself");star()};
+    rec.start();btn.classList.add("live");btn.innerHTML=bi("■ تَوَقَّفْ","Stop");
+  }catch(e){note.innerHTML=bi("الْمِيكْرُوفُون غَيْرُ مُتَاحٍ هُنَا","The microphone is blocked in this preview. It works in the real app.")}
+}
+const recorderUI=()=>"";
+function wireRec(){const b=$("#rec"),p=$("#mine"),n=$("#recnote");if(!b)return;b.onclick=()=>toggleRec(b,p,n);p.onclick=()=>{if(lastURL)new Audio(lastURL).play()}}
+const top0=()=>{$("main").scrollTop=0};
+const unlocked=u=>u.free||S.member;
+
+/* ================= ARABIC FIRST ================= */
+/* bi(): big Arabic on top, small English helper underneath */
+const bi=(a,e,cls="")=>`<span class="bi ${cls}"><span class="ar">${a}</span>${e?`<small>${e}</small>`:""}</span>`;
+const AN=n=>ARNUM(n);
+MARKS.forEach((m,i)=>m.a=["فَتْحَة","كَسْرَة","ضَمَّة","تَنْوِينُ الْفَتْح","تَنْوِينُ الْكَسْر","تَنْوِينُ الضَّمّ","سُكُون","شَدَّة"][i]);
+MADD.forEach((m,i)=>m.a=["أَلِفُ الْمَدّ","يَاءُ الْمَدّ","وَاوُ الْمَدّ"][i]);
+LEEN.forEach((m,i)=>m.a=["وَاوُ اللِّين","يَاءُ اللِّين"][i]);
+UNITS[UID("sukoon")].forms.forEach((m,i)=>m.a=["بَعْدَ الْفَتْحَة","بَعْدَ الْكَسْرَة","بَعْدَ الضَّمَّة"][i]);
+UNITS[UID("shadda")].forms.forEach((m,i)=>m.a=["مَعَ الْفَتْحَة","مَعَ الْكَسْرَة","مَعَ الضَّمَّة","مَعَ التَّنْوِين"][i]);
+const UA={letters:"الْحُرُوفُ الْهِجَائِيَّة",shapes:"أَشْكَالُ الْحُرُوف",joined:"الْحُرُوفُ الْمُرَكَّبَة",muqattaat:"الْحُرُوفُ الْمُقَطَّعَة",harakat:"الْحَرَكَات",tanween:"التَّنْوِين",small:"الْحُرُوفُ الصَّغِيرَة وَالْمَدَّة",madd:"حُرُوفُ الْمَدّ",leen:"حُرُوفُ اللِّين",sukoon:"السُّكُون",shadda:"الشَّدَّة",silent:"حُرُوفٌ لَا تُقْرَأ",waqf:"عَلَامَاتُ الْوَقْف",reading:"قِرَاءَةُ الْكَلِمَات",tajweed:"التَّجْوِيد",quran:"تِلَاوَةُ الْقُرْآن"};
+UNITS.forEach(u=>u.a=UA[u.id]);
+WORDS.forEach((g,i)=>g.a=["الْحَرَكَات","التَّنْوِين","الْمَدّ","اللِّين","السُّكُون","الشَّدَّة"][i]);
+JOINED.forEach(j=>{j.a=[...j.big].map(c=>NAME(c)[2]).join(" + ")});
+MUQ.forEach(m=>{m.a=m.read});
+SMALL.forEach((s,i)=>s.a=["الْأَلِفُ الْخَنْجَرِيَّة","الْوَاوُ الصَّغِيرَة","الْيَاءُ الصَّغِيرَة","الْمَدَّة"][i]);
+SILENT.forEach((s,i)=>s.a=["هَمْزَةُ الْوَصْل","الْأَلِفُ الْفَارِقَة","أَلِفُ أَنَا","وَاوٌ لَا تُقْرَأ","أَلِفُ مِائَة"][i]);
+WAQF.forEach((w,i)=>w.a=["وَقْفٌ لَازِم","لَا تَقِفْ","وَقْفٌ جَائِز","الْوَصْلُ أَوْلَى","الْوَقْفُ أَوْلَى","تَعَانُقُ الْوَقْف","نِهَايَةُ الْآيَة"][i]);
+TAJ.forEach((g,i)=>g.aa=["مِنْ أَيْنَ يَخْرُجُ هَذَا الْحَرْف؟","انْظُرْ إِلَى الْحَرْفِ بَعْدَ النُّونِ السَّاكِنَة","انْظُرْ إِلَى الْحَرْفِ بَعْدَ الْمِيمِ السَّاكِنَة","هَلْ فِيهِ غُنَّة؟","هَلْ فِيهِ قَلْقَلَة؟","هَلِ اللَّامُ قَمَرِيَّةٌ أَمْ شَمْسِيَّة؟","هَلِ الْحَرْفُ مُفَخَّمٌ أَمْ مُرَقَّق؟","هَلِ الرَّاءُ مُفَخَّمَةٌ أَمْ مُرَقَّقَة؟","هَلِ اللَّامُ مُفَخَّمَةٌ أَمْ مُرَقَّقَة؟","كَمْ حَرَكَةً نَمُدّ؟"][i]);
+const SHAPE_A={Alone:"مُنْفَرِد",Start:"فِي الْأَوَّل",Middle:"فِي الْوَسَط",End:"فِي الْآخِر"};
+const T={ /* reusable labels */
+ back:bi("رُجُوع","Back"),listen:bi("🔊 اسْتَمِعْ","Listen"),prev:bi("→ السَّابِق","Back"),
+ next:bi("التَّالِي ←","Next"),nextLetter:bi("الْحَرْفُ التَّالِي ←","Next letter"),nextWord:bi("الْكَلِمَةُ التَّالِيَة ←","Next word"),
+ finish:bi("أَتْمَمْتُ الْمُسْتَوَى ★","Finish level"),play:bi("🎮 الْعَبْ","Play this level"),
+ good:"أَحْسَنْتَ! ✓",again:"حَاوِلْ مَرَّةً أُخْرَى",soon:"🎧 صَوْتُ الْقَارِئ قَرِيبًا",masha:"مَا شَاءَ اللَّه! ★",
+};
+
+/* ================= PARENT GATE & PAYWALL ================= */
+let gateUntil=0;
+function parentGate(then,backTo=learn){
+  if(Date.now()<gateUntil)return then();
+  const a=3+Math.floor(Math.random()*6),b=4+Math.floor(Math.random()*6),ans=a*b;
+  const opts=shuffle([ans,ans+a,ans-b,ans+b+1]);
+  top0();
+  view.innerHTML=`<div class="focus gate">${bi("لِلْكِبَارِ فَقَط","Grown-ups only","h")}<p>To continue, please solve: what is ${a} × ${b}?</p>
+  <div class="choices">${opts.map(o=>`<button class="num" data-n="${o}">${o}</button>`).join("")}</div><button class="btn ghost" id="cancel">${T.back}</button></div>`;
+  $("#cancel").onclick=backTo;
+  view.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{if(+b.dataset.n===ans){gateUntil=Date.now()+5*60e3;then()}else{b.classList.add("bad");setTimeout(backTo,500)}});
+}
+function paywall(a,e){
+  top0();
+  view.innerHTML=`<div class="focus"><div class="big" style="font-size:4rem">🔒</div>${bi(a,e,"h")}
+  ${bi("هَذَا لِلْأَعْضَاء","This is for members")}
+  <p>A family membership unlocks every level, all tajwīd lessons and all games, for all your children.</p>
+  <div class="row"><button class="btn" id="ask">${bi("اسْأَلْ وَالِدَيْكَ","Ask a grown-up")}</button><button class="btn ghost" id="bk2">${T.back}</button></div></div>`;
+  $("#bk2").onclick=learn;$("#ask").onclick=()=>parentGate(parents);
+}
+
+/* ================= CERTIFICATE ================= */
+function finishLevel(k){
+  const u=UNITS[k],kd=kid();
+  if(!kd.done.includes(u.id))kd.done.push(u.id);star(3);
+  top0();
+  const d=new Date().toLocaleDateString("ar",{year:"numeric",month:"long",day:"numeric"});
+  view.innerHTML=`<div class="cert"><div class="cert-in">
+   <div class="ar cert-top">مَا شَاءَ اللَّه</div>${bi("شَهَادَةُ إِتْمَام","Certificate of completion")}
+   <h1>${escH(kd.name)}</h1>${bi("أَتَمَّ الْمُسْتَوَى "+AN(k+1),"finished level "+(k+1))}${bi(u.a,u.name,"h")}
+   <div class="cert-stars">★ ★ ★</div><span class="lvl ar">${d} · ★ ${AN(kd.stars)}</span></div></div>
+  <p class="note" style="align-self:center">Tip for parents: take a screenshot to share it with family.</p>
+  <div class="row">${k+1<UNITS.length?`<button class="btn" id="nx">${bi(UNITS[k+1].a+" ←","Next: "+UNITS[k+1].name)}</button>`:""}<button class="btn ghost" id="pt">${bi("الطَّرِيق","Back to path")}</button></div>`;
+  $("#pt").onclick=learn;if($("#nx"))$("#nx").onclick=()=>openUnit(k+1,0);
+}
+
+/* ================= LEARN ================= */
+function learn(){
+  top0();const kd=kid();
+  view.innerHTML=`<div class="playbar"><div>${bi("🎮 وَقْتُ اللَّعِب","Play time","h")}</div><div class="chips">${GAMES.map(g=>`<button class="chip" data-g="${g.id}" style="background:${g.col}"><span class="ar">${g.ic}</span><span class="ar cn">${g.a}${!g.free&&!S.member?" 🔒":""}</span><small>${g.name}</small></button>`).join("")}</div></div>
+  <div>${bi("طَرِيقُ الْقِرَاءَة",escH(kd.name)+"'s reading path","title")}
+  <p class="ar pa">${AN(kd.done.length)} مِنْ ${AN(UNITS.length)} مُسْتَوًى</p>
+  <div class="bar"><span style="width:${Math.round(kd.done.length/UNITS.length*100)}%"></span></div></div>
+  <div class="path">${UNITS.map((u,k)=>`<button class="step ${kd.done.includes(u.id)?"done":""}" data-u="${k}">
+    <span class="badge ar" style="background:${COLS[k%4]}">${u.ic}</span>
+    <span class="t"><span class="lvl ar">الْمُسْتَوَى ${AN(k+1)}</span><b class="ar ua">${u.a}</b><small class="en">${u.name}</small></span>
+    ${kd.done.includes(u.id)?'<span class="lock free ar">✓ تَمّ</span>':unlocked(u)?(u.free?'<span class="lock free ar">مَجَّانِي</span>':""):'<span class="lock ar">🔒</span>'}</button>`).join("")}</div>`;
+  view.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>openUnit(+b.dataset.u,0));
+  view.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>startGame(b.dataset.g));
+}
+function openUnit(k,i){
+  const u=UNITS[k];top0();
+  if(!unlocked(u))return paywall(u.a,u.name);
+  if(u.id==="letters")return letters(k,i);
+  if(u.id==="shapes")return shapes(k,i);
+  if(u.items)return itemLesson(k,i);
+  if(u.id==="reading")return reading(0,0);
+  if(u.id==="tajweed")return tajweed();
+  if(u.id==="quran")return quran(0);
+  return marks(k,i);
+}
+const backBtn=()=>`<button class="back" id="bk">← ${bi("الطَّرِيق","Path")}</button>`;
+const lvlLine=(k,i,n)=>`<span class="lvl ar">${UNITS[k].a} · ${AN(i+1)} مِنْ ${AN(n)}</span>`;
+function letterStrip(i,list){
+  return `<span class="lvl ar">اخْتَرْ حَرْفًا</span><div class="grid">${list.map((c,j)=>`<button class="tile sm ${j===i?"on":""}" data-j="${j}">${c}</button>`).join("")}</div>`;
+}
+const navRow=n=>`<div class="row"><button class="btn ghost" id="prev">${T.prev}</button><button class="btn" id="next">${n}</button></div>`;
+const nextLabel=(i,len,w=T.nextLetter)=>i===len-1?T.finish:w;
+function wireNav(k,i,len,unit){
+  $("#bk").onclick=learn;wireRec();wireSay();
+  const lg=$("#lg");if(lg)lg.onclick=()=>levelGame(lg.dataset.lg);
+  $("#prev").onclick=()=>unit(k,(i+len-1)%len);
+  $("#next").onclick=()=>{star();if(i===len-1)return finishLevel(k);unit(k,i+1)};
+  view.querySelectorAll("[data-j]").forEach(t=>t.onclick=()=>unit(k,+t.dataset.j));
+}
+function letters(k,i){
+  const [c,n,ar]=L[i];
+  view.innerHTML=`${backBtn()}
+  <div class="focus">${lvlLine(k,i,28)}<div class="big">${c}</div>${bi(ar,n,"name")}${recorderUI()}${playBtn(UNITS[k].id)}${navRow(nextLabel(i,28))}</div>${letterStrip(i,ALL)}`;
+  wireNav(k,i,28,letters);
+}
+function shapes(k,i){
+  const c=ALL[i],join=!NOJOIN.includes(c);
+  const f=join?[["Alone",c],["Start",c+"ـ"],["Middle","ـ"+c+"ـ"],["End","ـ"+c]]:[["Alone",c],["End","ـ"+c]];
+  view.innerHTML=`${backBtn()}
+  <div class="focus">${lvlLine(k,i,28)}${bi(L[i][2],L[i][1],"name")}
+  <div class="forms">${f.map(x=>`<button data-say="${esc(L[i][2])}"><span class="ar">${x[1]}</span><span class="ar fl">${SHAPE_A[x[0]]}</span><small>${x[0]}</small></button>`).join("")}</div>
+  ${join?bi("يَتَّصِلُ مِنَ الْجِهَتَيْن","Joins on both sides"):bi("لَا يَتَّصِلُ بِمَا بَعْدَه","Never joins the letter after it, so it has 2 shapes")}
+  ${recorderUI()}${playBtn(UNITS[k].id)}${navRow(nextLabel(i,28))}</div>${letterStrip(i,ALL)}`;
+  wireNav(k,i,28,shapes);
+}
+function marks(k,i){
+  const u=UNITS[k],list=u.noAlif?ALL.slice(1):ALL,c=list[i];
+  view.innerHTML=`${backBtn()}
+  <div class="focus">${lvlLine(k,i,list.length)}${bi(NAME(c)[2],NAME(c)[1],"name")}
+  <div class="forms">${u.forms.map(m=>`<button data-say="${esc(m.f(c))}"><span class="ar">${m.f(c)}</span><span class="ar fl">${m.a}</span><small>${m.t(c)}</small></button>`).join("")}</div>
+  ${recorderUI()}${playBtn(UNITS[k].id)}${navRow(nextLabel(i,list.length))}</div>${letterStrip(i,list)}`;
+  wireNav(k,i,list.length,marks);
+}
+function itemLesson(k,i){
+  const u=UNITS[k],it=u.items[i],len=u.items.length;
+  view.innerHTML=`${backBtn()}
+  <div class="focus">${lvlLine(k,i,len)}
+  <div class="big ${it.big.length>4?"mid":""}">${it.sign&&it.sign!==it.big?`<span class="sign">${it.sign}</span> `:""}${it.big}</div>
+  ${bi(it.a||it.title,it.ar?"":it.title,"name")}<p>${it.sub}</p>
+  
+  ${it.ex?`<span class="lvl ar">أَمْثِلَة</span><div class="row">${it.ex.map(e=>/[؀-ۿ]/.test(e)&&!/[a-z]/i.test(e)?`<button class="btn ghost ar exw" data-say="${esc(e)}">${e}</button>`:`<span class="note">${e}</span>`).join("")}</div>`:""}
+  ${it.note?`<p class="note">${it.note}</p>`:""}
+  ${recorderUI()}${playBtn(UNITS[k].id)}${navRow(nextLabel(i,len,T.next))}</div>
+  <div class="grid">${u.items.map((x,j)=>`<button class="tile sm wide ${j===i?"on":""}" data-j="${j}">${x.big}</button>`).join("")}</div>`;
+  wireNav(k,i,len,itemLesson);
+}
+function reading(g,i){
+  const grp=WORDS[g],w=grp.w[i];top0();
+  view.innerHTML=`${backBtn()}
+  <div class="chips tabs">${WORDS.map((x,j)=>`<button class="chip sm ${j===g?"on":""}" data-wg="${j}"><span class="ar">${x.a}</span></button>`).join("")}</div>
+  <div class="focus"><span class="lvl ar">كَلِمَاتٌ بِـ${grp.a} · ${AN(i+1)} مِنْ ${AN(grp.w.length)}</span>
+  <div class="word" id="wd">${w.map(p=>`<span>${p}</span>`).join("")}</div>
+  ${recorderUI()}<div class="row"><button class="btn ghost" id="prev">${T.prev}</button><button class="btn" id="next">${g===WORDS.length-1&&i===grp.w.length-1?T.finish:T.nextWord}</button></div></div>`;
+  $("#bk").onclick=learn;wireRec();
+  view.querySelectorAll("[data-wg]").forEach(b=>b.onclick=()=>reading(+b.dataset.wg,0));
+  const pg=(g+WORDS.length-1)%WORDS.length;
+  $("#prev").onclick=()=>i?reading(g,i-1):reading(pg,WORDS[pg].w.length-1);
+  $("#next").onclick=()=>{star();if(i<grp.w.length-1)return reading(g,i+1);if(g<WORDS.length-1){toast(T.masha);return reading(g+1,0)}finishLevel(UID("reading"))};
+}
+function tajweed(){
+  top0();
+  view.innerHTML=`${backBtn()}
+  <div>${bi("التَّجْوِيد","Tajwīd for kids","title")}<p class="ar pa">${AN(TAJ.length)} مَجْمُوعَات · ${AN(RULE_COUNT)} حُكْمًا</p></div>
+  <div class="games">${TAJ.map((g,j)=>`<button class="gcard" data-t="${j}"><span class="gic ar" style="background:${COLS[j%4]}">${g.ic}</span>${bi(g.ar,g.name,"h")}<p>${g.intro}</p></button>`).join("")}</div>`;
+  $("#bk").onclick=learn;
+  view.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>group(+b.dataset.t));
+}
+function group(t){
+  const g=TAJ[t];top0();
+  view.innerHTML=`<button class="back" id="bk">← ${bi("التَّجْوِيد","Tajwīd")}</button>
+  <div><span class="lvl ar">الْمَجْمُوعَة ${AN(t+1)} مِنْ ${AN(TAJ.length)}</span>${bi(g.ar,g.name,"title")}<p>${g.intro}</p></div>
+  <div class="games">${g.rules.map((r,k)=>`<button class="gcard" data-r="${k}" style="border-color:${COLS[k%4]}">${bi(r.ar,r.name,"h")}<p>${r.kid}</p></button>`).join("")}</div>
+  <div class="row"><button class="btn" id="srt">${bi("🎮 رَتِّبِ الْأَحْكَام","Play Rule Sorter")}</button><button class="btn ghost" id="nx">${t<TAJ.length-1?bi("الْمَجْمُوعَةُ التَّالِيَة ←","Next group"):T.finish}</button></div>`;
+  $("#bk").onclick=tajweed;$("#srt").onclick=()=>sorter(0,t);
+  $("#nx").onclick=()=>t<TAJ.length-1?group(t+1):finishLevel(UID("tajweed"));
+  view.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>rule(t,+b.dataset.r));
+}
+function rule(t,k){
+  const g=TAJ[t],r=g.rules[k],col=COLS[k%4];top0();
+  view.innerHTML=`<button class="back" id="bk">← ${bi(g.ar,"")}</button>
+  <div class="focus" style="border-color:${col}"><span class="lvl ar">${g.ar} · ${AN(k+1)} مِنْ ${AN(g.rules.length)}</span><div class="big" style="font-size:3.6rem">${r.ar}</div><small class="en">${r.name}</small>
+  <p>${r.kid}</p><span class="lvl">${r.tip}</span>
+  ${r.letters?`<div class="bubbles">${r.letters.map(c=>`<button style="border-color:${col}" data-say="${esc(g.p?g.p(c):c)}">${c}</button>`).join("")}</div>`:""}
+  <span class="lvl ar">أَمْثِلَةٌ مِنَ الْقُرْآن</span>
+  <div class="row">${r.ex.map(e=>`<button class="btn ghost ar exw" data-say="${esc(e)}">${e}</button>`).join("")}</div>
+  ${recorderUI()}
+  <div class="row"><button class="btn ghost" id="prev">${T.prev}</button><button class="btn" id="next">${k<g.rules.length-1?T.next:bi("🎮 رَتِّبِ الْأَحْكَام","Play Rule Sorter")}</button></div></div>`;
+  $("#bk").onclick=()=>group(t);wireRec();wireSay();
+  $("#prev").onclick=()=>k?rule(t,k-1):group(t);
+  $("#next").onclick=()=>{star();k<g.rules.length-1?rule(t,k+1):sorter(0,t)};
+}
+function quran(s){
+  const su=SURAHS[s];top0();
+  view.innerHTML=`${backBtn()}
+  <div class="chips tabs">${SURAHS.map((x,j)=>`<button class="chip sm ${j===s?"on":""}" data-s="${j}"><span class="ar">${x.ar}</span></button>`).join("")}</div>
+  <div class="focus mushaf"><span class="lvl ar">السُّورَة ${AN(s+1)} مِنْ ${AN(SURAHS.length)} · ${AN(su.a.length)} آيَات</span>${bi("سُورَةُ "+su.ar,su.n,"title")}
+  ${s>0?`<div class="ayah basm">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`:""}
+  <div class="ayat">${su.a.map((a,j)=>`<button class="ayah" data-say="${esc(a)}">${a} <span class="num">﴿${ARNUM(j+1)}﴾</span></button>`).join("")}</div>
+  ${recorderUI()}
+  <div class="row"><button class="btn" id="next">${s<SURAHS.length-1?bi("السُّورَةُ التَّالِيَة ←","Next sūrah"):T.finish}</button></div></div>`;
+  $("#bk").onclick=learn;wireRec();
+  view.querySelectorAll(".ayah[data-say]").forEach(b=>b.onclick=()=>{view.querySelectorAll(".ayah").forEach(x=>x.classList.remove("hi"));b.classList.add("hi");tapSay(b.dataset.say)});
+  view.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>quran(+b.dataset.s));
+  $("#next").onclick=()=>{star(2);s<SURAHS.length-1?quran(s+1):finishLevel(UID("quran"))};
+}
+
+/* ================= GAMES ================= */
+const LOOK=[["ب","ت","ث","ن","ي"],["ج","ح","خ"],["د","ذ"],["ر","ز"],["س","ش"],["ص","ض"],["ط","ظ"],["ع","غ"],["ف","ق"],["ا","ل"],["و","ر"],["م","ه"],["ك","ل"]];
+const SOUND=[["س","ص","ث"],["ت","ط"],["ذ","ز","ظ"],["ه","ح"],["ك","ق"],["د","ض"],["ا","ع"],["م","ن"]];
+const GAMES=[
+ {id:"hunt",a:"ابْحَثْ وَالْمِسْ",name:"Find & Tap",ic:"بَ بِ",col:"var(--sun)",sub:"Every letter with every haraka, tanwīn, madd, sukūn and shadda.",free:true},
+ {id:"twins",a:"الْحُرُوفُ الْمُتَشَابِهَة",name:"Twin Letters",ic:"ب ت ث",col:"var(--coral)",sub:"Look-alikes and sound-alikes for all 28 letters.",free:true},
+ {id:"shape",a:"شَكْلُ الْحَرْف",name:"Shape Finder",ic:"ـهـ",col:"var(--leaf)",sub:"Which letter is hiding in this shape?",free:true},
+ {id:"memory",a:"بِطَاقَاتُ الذَّاكِرَة",name:"Memory Cards",ic:"ب بَاء",col:"var(--sky)",sub:"Match each letter with its name. 5 rounds.",free:true},
+ {id:"marks",a:"مَا الْحَرَكَة؟",name:"Mark Match",ic:"بً بْ",col:"var(--coral)",sub:"Name all 8 harakat marks."},
+ {id:"sorter",a:"رَتِّبِ الْأَحْكَام",name:"Rule Sorter",ic:"نْ",col:"var(--sun)",sub:`Sort examples into all ${RULE_COUNT} tajwīd rules.`},
+ {id:"bounce",a:"قَفْزَةُ الْقَلْقَلَة",name:"Qalqalah Bounce",ic:"قطب",col:"var(--leaf)",sub:"Pop the five bouncing letters."},
+ {id:"stops",a:"عَلَامَاتُ الْوَقْف",name:"Stop Signs",ic:"ۘ ۚ",col:"var(--sky)",sub:"What does this waqf sign mean?"},
+];
+const G=id=>GAMES.find(g=>g.id===id);
+function startGame(id){
+  const g=G(id);top0();
+  if(!g.free&&!S.member)return paywall(g.a,g.name);
+  ({hunt:()=>hunt(0,0,"letters"),twins:()=>twins(0),shape:()=>shapeGame(0),memory:()=>memory(0),marks:()=>markGame(0),sorter:()=>sorter(0,-1),bounce,stops:()=>stops(0)})[id]();
+}
+function play(){
+  top0();
+  view.innerHTML=`<div>${bi("الْأَلْعَاب","Games","title")}<p>Every win earns a star.</p></div>
+  <div class="games">${GAMES.map(g=>`<button class="gcard" data-g="${g.id}"><span class="gic ar" style="background:${g.col}">${g.ic}</span>${bi(g.a+(g.free||S.member?"":" 🔒"),g.name,"h")}<p>${g.sub}</p></button>`).join("")}</div>`;
+  view.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>startGame(b.dataset.g));
+}
+function quiz(id,score,prompt,opts,isRight,next,cls=""){
+  const g=G(id);
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}<span class="meter ar">★ ${AN(score)}</span>${prompt}
+  <div class="choices ${cls}">${opts.map((o,j)=>`<button data-j="${j}">${o}</button>`).join("")}</div><p class="note ar fb" id="why"></p></div>`;
+  $("#bk").onclick=play;wireSay();
+  view.querySelectorAll(".choices [data-j]").forEach(b=>b.onclick=()=>{
+    const r=isRight(+b.dataset.j);
+    if(r){b.classList.add("good");star();$("#why").textContent=typeof r==="string"?r:T.good;setTimeout(()=>next(score+1),r===true?900:1700)}
+    else{b.classList.add("bad");$("#why").textContent=T.again;setTimeout(()=>b.classList.remove("bad"),400)}});
+}
+const four=ans=>shuffle([ans,...shuffle([...Array(28).keys()].filter(k=>k!==ans)).slice(0,3)]);
+/* every game walks through every letter once, in a shuffled order */
+const DECK={};
+function deckNext(key,list,round){if(round===0||!DECK[key]||DECK[key].length!==list.length)DECK[key]=shuffle(list.slice());return DECK[key][round]}
+const prog=(r,n)=>`<span class="lvl ar">الْحَرْف ${AN(r+1)} مِنْ ${AN(n)}</span><div class="bar"><span style="width:${Math.round(r/n*100)}%"></span></div>`;
+const ask=(a,e)=>`<div class="ask">${bi(a,e)}</div>`;
+function gameDone(id,count,again){
+  const g=G(id);star(3);top0();
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus"><div class="big" style="font-size:4rem">🏆</div>${bi("مَا شَاءَ اللَّه!","Mashallah!","title")}
+  ${bi(g.a,g.name,"h")}${bi("لَعِبْتَ كُلَّ الْحُرُوف ("+AN(count)+")","You played all "+count+" letters")}
+  <div class="row"><button class="btn" id="again">${bi("مَرَّةً أُخْرَى","Play again")}</button><button class="btn ghost" id="gm">${bi("أَلْعَابٌ أُخْرَى","More games")}</button></div></div>`;
+  $("#bk").onclick=play;$("#gm").onclick=play;$("#again").onclick=again;
+}
+const TAP_MODES=[{id:"letters",a:"الْحُرُوف",n:"Letters",free:true},...["harakat","tanween","madd","leen","sukoon","shadda"].map(id=>{const u=UNITS[UID(id)];return{id,a:u.a,n:u.name,forms:u.forms,noAlif:u.noAlif,free:u.free}})];
+let tapMode="letters";
+function hunt(round,score=0,mode){
+  if(mode){tapMode=mode;round=0;score=0}
+  const md=TAP_MODES.find(m=>m.id===tapMode),list=md.noAlif?ALL.slice(1):ALL;
+  if(round>=list.length)return gameDone("hunt",list.length,()=>hunt(0,0,tapMode));
+  const c=deckNext("tap"+tapMode,list,round);let target,opts,findA,findE;
+  if(!md.forms){target=NAME(c)[2];findA=NAME(c)[2];findE=NAME(c)[1];opts=four(ALL.indexOf(c)).map(i=>({t:ALL[i],ok:ALL[i]===c}))}
+  else{const f=pick(md.forms);target=f.f(c);findA=NAME(c)[2]+" + "+f.a;findE=f.t(c);
+    const own=md.forms.map(x=>({t:x.f(c),ok:x===f}));
+    opts=shuffle([...own,...shuffle(list.filter(x=>x!==c)).slice(0,4-own.length).map(x=>({t:f.f(x),ok:false}))])}
+  quiz("hunt",score,`<div class="chips tabs">${TAP_MODES.map(m=>`<button class="chip sm ${m.id===tapMode?"on":""}" data-tm="${m.id}"><span class="ar">${m.a}</span>${m.free||S.member?"":" 🔒"}</button>`).join("")}</div>
+    ${prog(round,list.length)}${hasAudio()?`<button class="btn" data-say="${esc(target)}">${T.listen}</button>${ask("مَاذَا سَمِعْتَ؟","Tap what you hear")}`:`${ask("ابْحَثْ عَنْ","Find")}<div class="findme">${bi(findA,findE)}</div>`}`,
+    opts.map(o=>o.t),j=>opts[j].ok,s=>hunt(round+1,s),md.forms?"small":"");
+  view.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{const m=TAP_MODES.find(x=>x.id===b.dataset.tm);if(!m.free&&!S.member)return paywall(m.a,m.n);hunt(0,0,m.id)});
+  say(target);
+}
+function twins(round,score=0){
+  if(round>=28)return gameDone("twins",28,()=>twins(0));
+  const c=deckNext("twins",ALL,round);
+  const fams=[...LOOK.filter(f=>f.includes(c)).map(f=>[1,f]),...SOUND.filter(f=>f.includes(c)).map(f=>[0,f])];
+  const [look,fam]=pick(fams),n=NAME(c),opts=shuffle(fam.slice()),snd=look?n[2]:base(c)+"َ";
+  quiz("twins",score,`${prog(round,28)}${look?bi("مُتَشَابِهَةُ الشَّكْل: عُدَّ النِّقَاط!","Look-alikes: count the dots!"):bi("مُتَشَابِهَةُ الصَّوْت: انْتَبِهْ!","Sound-alikes: listen closely!")}
+   ${ask("ابْحَثْ عَنْ","Find")}<div class="findme">${bi(n[2],n[1])}</div>${hasAudio()?`<button class="btn" data-say="${esc(snd)}">${T.listen}</button>`:""}`,
+   opts,j=>opts[j]===c?`${T.good} ${n[2]}`:false,s=>twins(round+1,s),fam.length>3?"wide":"");
+  say(snd);
+}
+function shapeGame(round,score=0){
+  if(round>=28)return gameDone("shape",28,()=>shapeGame(0));
+  const c=deckNext("shape",ALL,round),ans=ALL.indexOf(c),join=!NOJOIN.includes(c);
+  const shape=join?pick([c+"ـ","ـ"+c+"ـ","ـ"+c]):"ـ"+c,opts=four(ans);
+  quiz("shape",score,`${prog(round,28)}<div class="big">${shape}</div>${ask("أَيُّ حَرْفٍ هَذَا؟","Which letter is this?")}`,opts.map(o=>L[o][0]),
+    j=>{if(opts[j]===ans){say(L[ans][2]);return `${T.good} ${L[ans][2]}`}return false},s=>shapeGame(round+1,s));
+}
+function markGame(round,score=0){
+  const list=ALL.slice(1);
+  if(round>=list.length)return gameDone("marks",list.length,()=>markGame(0));
+  const c=deckNext("marks",list,round),mi=Math.floor(Math.random()*MARKS.length),m=MARKS[mi];
+  const opts=shuffle([mi,...shuffle([...MARKS.keys()].filter(k=>k!==mi)).slice(0,3)]);
+  quiz("marks",score,`${prog(round,list.length)}<div class="big">${m.f(c)}</div>${ask("مَا اسْمُ هَذِهِ الْحَرَكَة؟","Name the mark")}`,
+    opts.map(o=>`<span class="ar mk">◌${MARKS[o].m}</span><span class="ar on">${MARKS[o].a}</span><small>${MARKS[o].n}</small>`),
+    j=>opts[j]===mi?`${T.good} ${m.a}`:false,s=>markGame(round+1,s),"rules");
+}
+const LEVEL_GAME={letters:()=>hunt(0,0,"letters"),shapes:()=>shapeGame(0),waqf:()=>stops(0)};
+const playBtn=id=>LEVEL_GAME[id]||TAP_MODES.some(m=>m.id===id)?`<button class="btn ghost" id="lg" data-lg="${id}">${T.play}</button>`:"";
+function levelGame(id){top0();if(LEVEL_GAME[id])return LEVEL_GAME[id]();hunt(0,0,id)}
+let sortGroup=-1;
+function sorter(score,t){
+  if(t!==undefined)sortGroup=t;
+  const gi=sortGroup<0?Math.floor(Math.random()*TAJ.length):sortGroup,g=TAJ[gi];
+  const ri=Math.floor(Math.random()*g.rules.length),r=g.rules[ri];
+  const item=pick([...(r.letters&&g.p?r.letters.map(g.p):[]),...r.ex]);
+  quiz("sorter",score,
+    `<div class="chips tabs">${["الْكُلّ",...TAJ.map(x=>x.ic)].map((x,j)=>`<button class="chip sm ${j-1===sortGroup?"on":""}" data-sg="${j-1}"><span class="ar">${x}</span></button>`).join("")}</div>
+     <span class="lvl ar">${g.ar}</span>${ask(g.aa,g.ask)}<div class="big" style="font-size:3.4rem">${item}</div>${hasAudio()?`<button class="btn ghost" data-say="${esc(item)}">${T.listen}</button>`:""}`,
+    g.rules.map(x=>`<span class="ar">${x.ar}</span><small>${x.name}</small>`),
+    j=>j===ri?`${T.good} ${r.ar}`:false,s=>sorter(s),"rules");
+  view.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>sorter(score,+b.dataset.sg));
+}
+function stops(score){
+  const ai=Math.floor(Math.random()*WAQF.length),w=WAQF[ai];
+  const opts=shuffle([ai,...shuffle([...WAQF.keys()].filter(k=>k!==ai)).slice(0,3)]);
+  quiz("stops",score,`${ask("مَاذَا تَعْنِي هَذِهِ الْعَلَامَة؟","What does this sign mean?")}<div class="big"><span class="sign">${w.sign}</span></div><span class="lvl ar">${w.big}</span>`,
+    opts.map(o=>`<span class="ar on">${WAQF[o].a}</span><small>${WAQF[o].title}</small>`),
+    j=>opts[j]===ai?`${T.good} ${w.a}`:false,stops,"rules");
+}
+function memory(round=0){
+  const list=ALL,rounds=Math.ceil(list.length/6);
+  if(round===0||!DECK.mem||DECK.mem.length!==list.length)DECK.mem=shuffle(list.slice());
+  if(round>=rounds)return gameDone("memory",list.length,()=>memory(0));
+  const picks=DECK.mem.slice(round*6,round*6+6).map(c=>ALL.indexOf(c)),np=picks.length;
+  const cards=shuffle(picks.flatMap(i=>[{p:i,face:ALL[i],ar:true,s:L[i][2]},{p:i,face:L[i][2],ar:true,nm:true,s:L[i][2]}]));
+  let open=[],found=0;
+  const g=G("memory");
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}<span class="lvl ar">الْجَوْلَة ${AN(round+1)} مِنْ ${AN(rounds)}</span><div class="bar"><span style="width:${Math.round(round/rounds*100)}%"></span></div>
+  ${ask("طَابِقِ الْحَرْفَ بِاسْمِه","Match each letter with its name")}<span class="meter ar" id="mm">٠ / ${AN(np)}</span>
+  <div class="mem">${cards.map((c,j)=>`<button class="card arc ${c.nm?"nm":""}" data-c="${j}" aria-label="Hidden card"><span>${c.face}</span></button>`).join("")}</div>
+  <button class="btn" id="again" hidden>${round+1<rounds?bi("الْجَوْلَةُ التَّالِيَة ←","Next round"):T.finish}</button></div>`;
+  $("#bk").onclick=play;$("#again").onclick=()=>memory(round+1);
+  const els=[...view.querySelectorAll(".card")];
+  els.forEach((el,j)=>el.onclick=()=>{
+    if(open.length===2||el.classList.contains("up"))return;
+    el.classList.add("up");say(cards[j].s);open.push(j);
+    if(open.length===2){const[a,b]=open;
+      if(cards[a].p===cards[b].p){setTimeout(()=>{els[a].classList.add("done");els[b].classList.add("done");open=[];found++;star();$("#mm").textContent=`${AN(found)} / ${AN(np)}`;if(found===np){toast(T.masha);$("#again").hidden=false}},400)}
+      else setTimeout(()=>{els[a].classList.remove("up");els[b].classList.remove("up");open=[]},900)}
+  });
+}
+function bounce(){
+  const Q="قطبجد",pool=shuffle([...Q,...shuffle(without("ا"+Q)).slice(0,7)]);let left=5;
+  const g=G("bounce");
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}
+  ${ask("حُرُوفُ الْقَلْقَلَة: قُطْبُ جَدٍّ","Pop the five bouncing letters")}<span class="meter ar" id="left">بَقِيَ ٥</span>
+  <div class="bubbles">${pool.map(c=>`<button data-c="${c}">${c}</button>`).join("")}</div><button class="btn ghost" id="again">${bi("مَرَّةً أُخْرَى","Play again")}</button></div>`;
+  $("#bk").onclick=play;$("#again").onclick=bounce;
+  view.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{if(b.classList.contains("pop"))return;
+    if(Q.includes(b.dataset.c)){b.classList.add("pop");say("أَ"+b.dataset.c+"ْ");left--;star();$("#left").textContent=left?"بَقِيَ "+AN(left):T.masha;if(!left)toast(T.masha)}
+    else{b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400)}});
+}
+
+/* ================= CHILDREN ================= */
+function kids(){
+  top0();
+  view.innerHTML=`<div>${bi("مَنْ يَقْرَأُ الْآن؟","Who's reading?","title")}</div>
+  <div class="games">${S.kids.map(k=>`<button class="gcard kidcard ${k.id===S.cur?"on":""}" data-k="${k.id}"><span class="av">${k.av}</span><h2>${escH(k.name)}</h2><p class="ar">★ ${AN(k.stars)} · 🔥 ${AN(k.streak)} · ${AN(k.done.length)}/${AN(UNITS.length)}</p></button>`).join("")}</div>
+  <form class="plan" id="add">${bi("أَضِفْ طِفْلًا","Add a child","h")}
+   <label for="kidname" class="lvl">Name</label><input id="kidname" maxlength="20" placeholder="e.g. Amina" autocomplete="off">
+   <span class="lvl">Pick a picture</span><div class="row" style="justify-content:flex-start">${AVATARS.map((a,j)=>`<button type="button" class="avpick ${j?"":"on"}" data-a="${a}">${a}</button>`).join("")}</div>
+   <button class="btn" type="submit">${bi("أَضِفْ","Add child")}</button></form>`;
+  let av=AVATARS[0];
+  view.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{S.cur=+b.dataset.k;save();header();toast("بِسْمِ اللَّه، "+kid().name);learn()});
+  view.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{av=b.dataset.a;view.querySelectorAll("[data-a]").forEach(x=>x.classList.toggle("on",x===b))});
+  $("#add").onsubmit=e=>{e.preventDefault();const n=$("#kidname").value.trim();if(!n){$("#kidname").focus();return toast("Type a name first")}
+    const id=Math.max(...S.kids.map(k=>k.id))+1;S.kids.push({id,name:n,av,stars:0,done:[],streak:0,last:""});S.cur=id;save();header();toast("أَهْلًا "+n);learn()};
+}
+
+/* ================= PARENTS ================= */
+function parents(){
+  top0();
+  view.innerHTML=`<div dir="ltr" class="ltr"><div><h1>Parents</h1><p>Progress for each child, and your membership.</p></div>
+  <div class="games">${S.kids.map(k=>`<div class="plan"><div class="row" style="justify-content:flex-start;gap:8px"><span class="av sm">${k.av}</span><h2>${escH(k.name)}</h2></div>
+    <div class="bar"><span style="width:${Math.round(k.done.length/UNITS.length*100)}%"></span></div>
+    <p>${k.done.length} of ${UNITS.length} levels · ★ ${k.stars} · 🔥 ${k.streak}-day streak</p>
+    <p class="note">${k.done.length?"Finished: "+k.done.map(id=>UNITS[UID(id)].name).join(", "):"No levels finished yet"}</p>
+    ${S.kids.length>1?`<button class="btn ghost" data-del="${k.id}">Remove</button>`:""}</div>`).join("")}</div>
+  <h2>Memberships</h2><p>Priced so every family can afford it. One plan covers all your children on phone, iPad and computer.</p>
+  <div class="plans">
+   <div class="plan ${S.member?"":"best"}"><h2>Free</h2><div class="price">$0</div><ul><li>Levels 1–5: letters, shapes, joined letters, muqaṭṭaʿāt, harakat</li><li>Find & Tap, Twin Letters, Shape Finder, Memory Cards</li></ul></div>
+   <div class="plan ${S.member?"best":""}"><span class="tag">Most families</span><h2>Family</h2><div class="price">$3.99<small> / month</small></div><ul><li>All ${UNITS.length} levels, through Qurʾān practice</li><li>Tajwīd: ${TAJ.length} groups, ${RULE_COUNT} rules</li><li>All ${GAMES.length} games</li><li>Voice check on recordings</li><li>Up to 4 children</li></ul></div>
+   <div class="plan"><h2>Family yearly</h2><div class="price">$29.99<small> / year</small></div><ul><li>Everything in Family</li><li>About $2.50 a month</li></ul></div>
+   <div class="plan"><h2>Masjid & school</h2><div class="price">$1<small> / child / month</small></div><ul><li>Teacher dashboard</li><li>Class progress</li><li>Hardship scholarships</li></ul></div>
+  </div>
+  <div class="plan"><span class="lvl">Prototype only</span><p>Payments aren't connected yet. Use this switch to try the app as a member.</p>
+   <button class="btn" id="mem">${S.member?"Switch back to Free":"Try as a member"}</button></div>
+  <div class="plan"><h2>What your child learns</h2><ol class="curr">${UNITS.map(u=>`<li><b>${u.name}</b> · ${u.sub}</li>`).join("")}</ol>
+   <span class="lvl">Tajwīd groups</span><ul>${TAJ.map(g=>`<li>${g.name}: ${g.rules.map(r=>r.name).join(", ")}</li>`).join("")}</ul>
+   <span class="lvl">Qurʾān practice</span><p>${SURAHS.map(s=>s.n).join(", ")}</p></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn ghost" id="reset">Reset all progress</button></div></div>`;
+  $("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
+  view.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.kids=S.kids.filter(k=>k.id!==+b.dataset.del);if(!S.kids.some(k=>k.id===S.cur))S.cur=S.kids[0].id;save();header();parents()});
+  const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
+}
+
+const TABS={learn,play,parents:()=>parentGate(parents)};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-current",x===b));TABS[b.dataset.tab]()});
+$("#who").onclick=kids;
+
+header();learn();
+</script>
+
+</body>
+</html>
