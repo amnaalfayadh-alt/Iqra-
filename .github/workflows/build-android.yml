@@ -12,13 +12,13 @@ jobs:
       BUILD_NUMBER: ${{ github.run_number }}
       HAS_KEY: ${{ secrets.KEYSTORE_BASE64 != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -30,7 +30,13 @@ jobs:
         run: npx cap sync android
 
       - name: Build test app (APK, for your phone)
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+        run: |
+          cd android && chmod +x gradlew
+          set -o pipefail
+          ./gradlew assembleDebug --stacktrace 2>&1 | tee "$RUNNER_TEMP/build.log" || {
+            grep -E "What went wrong|error:|Error|Exception|Could not|> " "$RUNNER_TEMP/build.log" | head -25 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
 
       - name: Prepare signing key
         if: env.HAS_KEY == 'true'
