@@ -580,6 +580,10 @@ const AVATARS=["🌙","⭐","🌸","🦁","🐢","🚀","🐪","🌴"];
 const today=()=>new Date().toISOString().slice(0,10);
 let S={kids:[{id:1,name:"صَدِيقِي",av:"🌙",stars:0,done:[],streak:0,last:""}],cur:1,member:false};
 try{const s=JSON.parse(localStorage.getItem("iqraState")||"null");if(s&&s.kids&&s.kids.length)S=s}catch(e){}
+/* Testing phase: every level, lesson and game is open, and no grown-up check is needed.
+   To bring back memberships and the parent check later, set OPEN_ALL to false. */
+const OPEN_ALL=true;
+if(OPEN_ALL)S.member=true;
 const save=()=>{try{localStorage.setItem("iqraState",JSON.stringify(S))}catch(e){}};
 const kid=()=>S.kids.find(k=>k.id===S.cur)||S.kids[0];
 const escH=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
@@ -683,7 +687,7 @@ const T={ /* reusable labels */
 /* ================= PARENT GATE & PAYWALL ================= */
 let gateUntil=0;
 function parentGate(then,backTo=learn){
-  if(Date.now()<gateUntil)return then();
+  if(OPEN_ALL||Date.now()<gateUntil)return then();
   const a=3+Math.floor(Math.random()*6),b=4+Math.floor(Math.random()*6),ans=a*b;
   const opts=shuffle([ans,ans+a,ans-b,ans+b+1]);
   top0();
@@ -1641,14 +1645,14 @@ function parents(){
    <div class="plan"><h2>Family yearly</h2><div class="price">$29.99<small> / year</small></div><ul><li>Everything in Family</li><li>About $2.50 a month</li></ul></div>
    <div class="plan"><h2>Masjid & school</h2><div class="price">$1<small> / child / month</small></div><ul><li>Teacher dashboard</li><li>Class progress</li><li>Hardship scholarships</li></ul></div>
   </div>
-  <div class="plan"><span class="lvl">Prototype only</span><p>Payments aren't connected yet. Use this switch to try the app as a member.</p>
-   <button class="btn" id="mem">${S.member?"Switch back to Free":"Try as a member"}</button></div>
+  ${OPEN_ALL?`<div class="plan"><span class="lvl">Testing version</span><p>Everything in the app is open for free while you test it. No payment and no parent check.</p></div>`:`<div class="plan"><span class="lvl">Prototype only</span><p>Payments aren't connected yet. Use this switch to try the app as a member.</p>
+   <button class="btn" id="mem">${S.member?"Switch back to Free":"Try as a member"}</button></div>`}
   <div class="plan"><h2>What your child learns</h2><ol class="curr">${UNITS.map(u=>`<li><b>${u.name}</b> · ${u.sub}</li>`).join("")}</ol>
    <span class="lvl">Tajwīd groups</span><ul>${TAJ.map(g=>`<li>${g.name}: ${g.rules.map(r=>r.name).join(", ")}</li>`).join("")}</ul>
    <span class="lvl">Qurʾān practice</span><p>${SURAHS.map(s=>s.n).join(", ")}</p></div>
   <div class="row" style="justify-content:flex-start"><button class="btn ghost" id="reset">Reset all progress</button></div></div>`;
   wireDash();
-  $("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
+  if($("#mem"))$("#mem").onclick=()=>{S.member=!S.member;save();toast(S.member?"Member preview on":"Back to Free");parents()};
   view.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.kids=S.kids.filter(k=>k.id!==+b.dataset.del);if(!S.kids.some(k=>k.id===S.cur))S.cur=S.kids[0].id;save();header();parents()});
   const r=$("#reset");r.onclick=()=>{if(r.dataset.sure){S.kids.forEach(k=>Object.assign(k,{stars:0,done:[],doneR:[],stickers:[],day:null,chest:20,log:{},miss:{},hw:null,hwDays:[],streak:0,last:""}));save();header();parents();toast("Progress reset")}else{r.dataset.sure=1;r.textContent="Tap again to reset everything"}};
 }
