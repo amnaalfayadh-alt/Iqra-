@@ -11,8 +11,8 @@
 /* Layout: one-screen kid app — top bar, scrolling view, fat bottom tab bar */
 :root{
   /* bright, happy palette on a white page (single light theme by request) */
-  --bg:#FFFFFF; --surface:#FFFFFF; --tint:#F3F8FF; --ink:#1E2A4A; --muted:#66779A;
-  --sun:#FFC93C; --leaf:#1FC38D; --coral:#FF6B8B; --sky:#3D9BFF; --grape:#A66BFF; --line:#E2EAF6;
+  --bg:#FFFFFF; --surface:#FFFFFF; --tint:#F6F9FB; --ink:#34475B; --muted:#718293;
+  --sun:#F8DFA2; --leaf:#78BBA7; --coral:#F4B8A9; --sky:#A8C9EB; --grape:#CDB8F0; --line:#E3EAEF;
   --display:"Baloo 2",ui-rounded,system-ui,sans-serif;
   --body:"Nunito",system-ui,sans-serif;
   --arabic:"Amiri Quran","Amiri","Noto Naskh Arabic","Geeza Pro",serif;
@@ -351,29 +351,37 @@ nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,va
 .wagon .ar{width:44px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;line-height:1.3;color:#16324F}
 .wagon.full{background:#2BA88A}.wagon.full .ar{animation:pop .3s}
 .wagon i{position:absolute;bottom:-11px;width:18px;height:18px;border-radius:50%;background:#16324F;border:4px solid #FFC83D}.wagon i:first-of-type{left:6px}.wagon i:last-of-type{right:6px}
-/* happy colours */
+/* calm pastel colours */
 .top{background:#FFFFFF;border-bottom:3px solid transparent;border-image:linear-gradient(90deg,var(--coral),var(--sun),var(--leaf),var(--sky),var(--grape)) 1}
-.brand{color:var(--sky)}
-.pill{background:#FFF6DA;border-color:#FFE39A}
-.playbar{background:linear-gradient(135deg,#3D9BFF,#A66BFF);color:#fff}
-.playbar p,.playbar .bi small{color:rgba(255,255,255,.9)}
-.greet{background:linear-gradient(135deg,#FFF6DA,#FFE9F0);border-color:#FFE39A}
-.hw{background:linear-gradient(160deg,#FFFDF4,#FFF6DA);border-color:var(--sun)}
+.brand{color:#5E8FC0}
+.pill{background:#FDF6E4;border-color:#F3E3B8}
+.playbar{background:#EAF5F1;color:var(--ink)}
+.playbar p,.playbar .bi small{color:var(--muted)}
+.greet{background:linear-gradient(135deg,#FDF6E4,#FBEDEA);border-color:#F3E3B8}
+.hw{background:linear-gradient(160deg,#FFFFFF,#FDF6E4);border-color:var(--sun)}
 .tracks{background:var(--tint);border-color:var(--line)}
-.trk.on{background:var(--leaf)}
+.trk.on{background:var(--leaf);color:var(--ink)}.trk.on small{color:var(--ink)}
 .step{border-width:2px;box-shadow:0 4px 0 var(--line)}
-.step:nth-child(4n+1){border-color:#FFD6E0}.step:nth-child(4n+2){border-color:#CDEBFF}.step:nth-child(4n+3){border-color:#D6F5E8}.step:nth-child(4n){border-color:#E9DDFF}
+.step:nth-child(4n+1){border-color:#F6D6CE}.step:nth-child(4n+2){border-color:#D3E4F5}.step:nth-child(4n+3){border-color:#CFE6DE}.step:nth-child(4n){border-color:#E4DAF6}
 .focus{box-shadow:0 6px 0 var(--line)}
 .gcard{box-shadow:0 4px 0 var(--line)}
-.wcard{border-color:#CDEBFF;background:linear-gradient(#FFFFFF,#F3F8FF)}
-.sent{background:linear-gradient(135deg,#FFF6DA,#FFE9F0)}
+.wcard{border-color:#D3E4F5;background:linear-gradient(#FFFFFF,#F6F9FB)}
+.sent{background:linear-gradient(135deg,#FDF6E4,#FBEDEA)}
 nav{background:#FFFFFF;border-top:3px solid var(--line)}
-nav button[aria-current="true"]{background:linear-gradient(135deg,#FFE9A8,#FFD3DF)}
-.btn{box-shadow:0 4px 0 #E3A800}
-.btn.ghost{background:#FFFFFF;border:2px solid #CDEBFF}
+nav button[aria-current="true"]{background:color-mix(in srgb,var(--sun) 45%,transparent)}
+.btn{box-shadow:0 4px 0 #D9B86A;color:var(--ink)}
+.btn.ghost{background:#FFFFFF;border:2px solid #D3E4F5}
 .rstep{box-shadow:0 4px 0 var(--line)}
 .dash{background:#FFFFFF}
 .cert{background:linear-gradient(135deg,var(--sun),var(--coral))}
+.tag,.hwi.ok .hwc,.bubbles button.pop{color:var(--ink)}
+.stage.fishing{background:linear-gradient(#CBEAF4,#93C6DF 60%,#78AFCF)}
+.stage.bubbles{background:linear-gradient(#D6E8F8,#EEF5FC 70%,#FFFFFF)}
+.wagon{background:var(--sky)}.wagon.full{background:var(--leaf)}
+.mlines line{stroke:#5FA48F}
+.ring .rfg{stroke:#5FA48F}
+.dots span.on{background:#EFC870}
+.findme .ar,.fb,.duaa,.cert-top,.hwdone,.mword.full,.gc{color:#4E9A83!important}
 /* spacing fixes: keep last so they win */
 .ltile{display:flex;align-items:center;justify-content:center;line-height:1.3;padding-bottom:12px}
 nav button{gap:6px;padding-block:8px 6px}
@@ -873,6 +881,11 @@ function quran(s){
 const LOOK=[["ب","ت","ث","ن","ي"],["ج","ح","خ"],["د","ذ"],["ر","ز"],["س","ش"],["ص","ض"],["ط","ظ"],["ع","غ"],["ف","ق"],["ا","ل"],["و","ر"],["م","ه"],["ك","ل"]];
 const SOUND=[["س","ص","ث"],["ت","ط"],["ذ","ز","ظ"],["ه","ح"],["ك","ق"],["د","ض"],["ا","ع"],["م","ن"]];
 const GAMES=[
+ {id:"builder",a:"مُهَنْدِسُ الْكَلِمَات",name:"Word Architect",ic:"🧩",col:"var(--sun)",sub:"Build fully vowelled Arabic words from shuffled pieces.",free:true},
+ {id:"detective",a:"مُحَقِّقُ الْحَرَكَات",name:"Haraka Detective",ic:"🔎",col:"var(--coral)",sub:"Find the missing vowel in a word.",free:true},
+ {id:"sequence",a:"سُلَّمُ الْقِرَاءَة",name:"Reading Ladder",ic:"🪜",col:"var(--leaf)",sub:"Climb from letters to syllables to whole words.",free:true},
+ {id:"tajchallenge",a:"تَحَدِّي التَّجْوِيد",name:"Tajweed Master",ic:"🏅",col:"var(--sky)",sub:"Spot the tajweed rule in real examples.",free:true},
+ {id:"speed",a:"سِبَاقُ الْحُرُوف",name:"Letter Sprint",ic:"⚡",col:"var(--coral)",sub:"Beat the clock: 10 letters in one minute.",free:true},
  {id:"hunt",a:"ابْحَثْ وَالْمِسْ",name:"Find & Tap",ic:"بَ بِ",col:"var(--sun)",sub:"Every letter with every haraka, tanwīn, madd, sukūn and shadda.",free:true},
  {id:"twins",a:"الْحُرُوفُ الْمُتَشَابِهَة",name:"Twin Letters",ic:"ب ت ث",col:"var(--coral)",sub:"Look-alikes and sound-alikes for all 28 letters.",free:true},
  {id:"shape",a:"شَكْلُ الْحَرْف",name:"Shape Finder",ic:"ـهـ",col:"var(--leaf)",sub:"Which letter is hiding in this shape?",free:true},
@@ -886,9 +899,10 @@ const G=id=>GAMES.find(g=>g.id===id);
 function startGame(id){
   const g=G(id);top0();
   if(!g.free&&!S.member)return paywall(g.a,g.name);
-  ({hunt:()=>hunt(0,0,"letters"),twins:()=>twins(0),shape:()=>shapeGame(0),memory:()=>memory(0),marks:()=>markGame(0),sorter:()=>sorter(0,-1),bounce,stops:()=>stops(0)})[id]();
+  ({builder:()=>advancedBuilder(0,0),detective:()=>advancedDetective(0,0),sequence:()=>advancedLadder(0,0),tajchallenge:()=>advancedTaj(0,0),speed:()=>advancedSprint(0,0),hunt:()=>hunt(0,0,"letters"),twins:()=>twins(0),shape:()=>shapeGame(0),memory:()=>memory(0),marks:()=>markGame(0),sorter:()=>sorter(0,-1),bounce,stops:()=>stops(0)})[id]();
 }
 function play(){
+  if(typeof sprintTimer!=="undefined")clearInterval(sprintTimer);
   top0();
   view.innerHTML=`<div>${bi("الْأَلْعَاب","Games","title")}<p>Every win earns a star.</p></div>
   ${bi("🎪 أَلْعَابُ الحَرَكَة","Action games","h")}
@@ -901,6 +915,54 @@ function play(){
   view.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>rGame(b.dataset.rg,0,0));
   view.querySelectorAll("[data-g2]").forEach(b=>b.onclick=()=>g2Start(b.dataset.g2));
 }
+/* Advanced game engines: all rounds are finite and keep rewards per completed answer. */
+const ADV_WORDS=WORDS.flatMap(g=>g.w).filter(w=>w.length>=2&&w.length<=4);
+function advancedBuilder(round,score){
+ const total=10;if(round>=total)return gameDone("builder",total,()=>advancedBuilder(0,0));
+ const pieces=deckNext("advancedBuilder",ADV_WORDS,round),target=pieces.join("");
+ let selected=[],available=shuffle(pieces.map((v,i)=>({v,i}))),locked=false;
+ function draw(){
+  view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi("مُهَنْدِسُ الْكَلِمَات","Word Architect","h")}${prog(round,total)}${ask("رَتِّبِ الْمَقَاطِعِ لِتَصْنَعَ الْكَلِمَة","Arrange the pieces to build the word")}<div class="big mid">${target}</div><div class="row" style="min-height:72px;direction:rtl">${selected.map(x=>`<button class="tile wide" data-remove="${x.i}">${x.v}</button>`).join("")||'<span class="note">اضْغَطْ عَلَى الْمَقَاطِعِ أَدْنَاهُ</span>'}</div><div class="row" style="direction:rtl">${available.filter(x=>!selected.some(y=>y.i===x.i)).map(x=>`<button class="tile wide" data-add="${x.i}">${x.v}</button>`).join("")}</div><p class="fb" id="why"></p><button class="btn ghost" id="reset">${bi("أَعِدِ التَّرْتِيب","Reset")}</button></div>`;
+  $("#bk").onclick=play;$("#reset").onclick=()=>{selected=[];draw()};
+  view.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{if(locked)return;selected.push(available.find(x=>x.i===+b.dataset.add));check()});
+  view.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{if(locked)return;selected=selected.filter(x=>x.i!==+b.dataset.remove);draw()});
+ }
+ function check(){draw();if(selected.length!==pieces.length)return;
+  if(selected.every((x,i)=>x.i===i)){locked=true;star(2);$("#why").textContent=T.good;setTimeout(()=>advancedBuilder(round+1,score+1),850)}
+  else{$("#why").textContent=T.again;setTimeout(()=>{selected=[];draw()},900)}
+ }draw();
+}
+function advancedDetective(round,score){
+ const total=12;if(round>=total)return gameDone("detective",total,()=>advancedDetective(0,0));
+ const pieces=deckNext("advancedDetective",ADV_WORDS,round),index=Math.floor(Math.random()*pieces.length),correct=pieces[index];
+ const variants=["َ","ِ","ُ","ْ","ّ","ٌ","ٍ"],baseLetter=correct.replace(/[\u064b-\u065f]/g,"");
+ const choices=shuffle([correct,...shuffle(variants.map(m=>baseLetter+m).filter(v=>v!==correct)).slice(0,3)]);
+ quiz("detective",score,`${prog(round,total)}${ask("أَكْمِلِ الْكَلِمَةَ بِالتَّشْكِيلِ الصَّحِيح","Choose the correct vowelled piece")}<div class="big mid">${pieces.map((v,i)=>i===index?"□":v).join("")}</div>`,choices,j=>choices[j]===correct,sc=>advancedDetective(round+1,sc),"small");
+}
+function advancedLadder(round,score){
+ const total=12;if(round>=total)return gameDone("sequence",total,()=>advancedLadder(0,0));
+ const tier=Math.floor(round/4),pieces=deckNext("advancedLadder",ADV_WORDS,round);
+ const target=tier===0?pieces[0]:tier===1?pieces.slice(0,2).join(""):pieces.join("");
+ const options=shuffle([target,...shuffle(ADV_WORDS.map(w=>tier===0?w[0]:tier===1?w.slice(0,2).join(""):w.join("")).filter(x=>x!==target)).filter((x,i,a)=>a.indexOf(x)===i).slice(0,3)]);
+ quiz("sequence",score,`${prog(round,total)}${bi(["المُسْتَوَى ١: حُرُوف","المُسْتَوَى ٢: مَقَاطِع","المُسْتَوَى ٣: كَلِمَات"][tier],["Level 1 · Letters","Level 2 · Syllables","Level 3 · Words"][tier])}${ask("أَيُّ خِيَارٍ يُطَابِقُ النَّصَّ؟","Find the exact match")}<div class="big mid">${target}</div>`,options,j=>options[j]===target,sc=>advancedLadder(round+1,sc),"small");
+}
+function advancedTaj(round,score){
+ const total=12;if(round>=total)return gameDone("tajchallenge",total,()=>advancedTaj(0,0));
+ const groups=TAJ.filter(g=>g.rules.length>=2),g=groups[round%groups.length],ri=Math.floor(Math.random()*g.rules.length),r=g.rules[ri];
+ const example=pick(r.ex),opts=shuffle(g.rules.map((x,i)=>({x,i})));
+ quiz("tajchallenge",score,`${prog(round,total)}<span class="lvl ar">${g.ar}</span>${ask("اكْتَشِفْ حُكْمَ التَّجْوِيد","Identify the tajweed rule")}<div class="big mid">${example}</div>`,opts.map(o=>`<span class="ar on">${o.x.ar}</span><small>${o.x.name}</small>`),j=>opts[j].i===ri?`${T.good} ${r.ar}`:false,sc=>advancedTaj(round+1,sc),"rules");
+}
+let sprintTimer=null;
+function advancedSprint(round,score,deadline){
+ clearInterval(sprintTimer);const total=10;if(round>=total)return gameDone("speed",total,()=>advancedSprint(0,0));
+ if(!deadline)deadline=Date.now()+60000;
+ if(Date.now()>=deadline)return sprintEnd(score);
+ const c=deckNext("advancedSprint",ALL,round),opts=shuffle([c,...shuffle(ALL.filter(x=>x!==c)).slice(0,3)]);
+ quiz("speed",score,`${prog(round,total)}${ask("ابْحَثْ عَنِ الْحَرْفِ بِسُرْعَة","Find the letter quickly")}<div class="big mid">${NAME(c)[2]}</div><div class="meter ar" id="clock">⏱ ${AN(Math.ceil((deadline-Date.now())/1000))}</div>`,opts,j=>opts[j]===c,sc=>advancedSprint(round+1,sc,deadline));
+ sprintTimer=setInterval(()=>{const left=Math.max(0,Math.ceil((deadline-Date.now())/1000));if($("#clock"))$("#clock").textContent="⏱ "+AN(left);else{clearInterval(sprintTimer);return}if(!left){clearInterval(sprintTimer);sprintEnd(score)}},250);
+ const back=$("#bk");back.onclick=()=>{clearInterval(sprintTimer);play()};
+}
+function sprintEnd(score){clearInterval(sprintTimer);star(1);hwMark("game");view.innerHTML=`<div class="focus">${bi("انْتَهَى الْوَقْت","Time is up","title")}<p class="ar meter">★ ${AN(score)} مِنْ ١٠</p><button class="btn" id="retry">${bi("حَاوِلْ مَرَّةً أُخْرَى","Try again")}</button><button class="btn ghost" id="bk">${bi("الْأَلْعَاب","Games")}</button></div>`;$("#retry").onclick=()=>advancedSprint(0,0);$("#bk").onclick=play}
 function quiz(id,score,prompt,opts,isRight,next,cls=""){
   const g=G(id);
   view.innerHTML=`<button class="back" id="bk">← ${bi("الْأَلْعَاب","Games")}</button><div class="focus">${bi(g.a,g.name,"h")}<span class="meter ar">★ ${AN(score)}</span>${prompt}
@@ -1200,7 +1262,7 @@ function confetti(x,y,n=40){
   if(reduceMotion()||!window.requestAnimationFrame)return;
   let c=$("#confetti");if(!c){c=document.createElement("canvas");c.id="confetti";document.body.appendChild(c)}
   const dpr=window.devicePixelRatio||1;c.width=innerWidth*dpr;c.height=innerHeight*dpr;const g=c.getContext("2d");g.scale(dpr,dpr);
-  const cols=["#FFC83D","#2BA88A","#FF7A6B","#4C8DF6","#B98CFF"];
+  const cols=["#F3D27E","#7FC6AE","#F4A99A","#8FB8E3","#BFA6EC"];
   const ps=Array.from({length:n},()=>({x:x??innerWidth/2,y:y??innerHeight/3,vx:(Math.random()-.5)*9,vy:Math.random()*-9-3,r:Math.random()*5+3,c:pick1(cols),a:Math.random()*6,s:Math.random()<.5}));
   let f=0;if(window.cancelAnimationFrame)cancelAnimationFrame(confetti.raf);
   (function tick(){g.clearRect(0,0,innerWidth,innerHeight);ps.forEach(p=>{p.vy+=.32;p.x+=p.vx;p.y+=p.vy;p.a+=.2;g.save();g.translate(p.x,p.y);g.rotate(p.a);g.fillStyle=p.c;
@@ -1431,17 +1493,17 @@ const promptHTML=q=>q.pic?`<span class="ppic">${q.pic}</span>`:`<span class="ptx
 const ART={
  fish:(col)=>`<svg viewBox="0 0 120 70" class="fishsvg" aria-hidden="true"><path d="M24 35C42 4 92 6 106 35C92 64 42 66 24 35Z" fill="${col}"/><path d="M26 35L4 14Q9 35 4 56Z" fill="${col}" opacity=".8"/><path d="M58 12Q66 2 76 10" stroke="${col}" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="90" cy="28" r="6" fill="#fff"/><circle cx="91" cy="28" r="3" fill="#16324F"/></svg>`,
  camel:(col)=>`<svg viewBox="0 0 120 92" class="camelsvg" aria-hidden="true"><g fill="${col}"><path d="M16 52Q18 32 36 33Q44 12 58 30Q68 16 80 34L88 34Q92 16 102 14Q113 13 114 22L107 27Q103 27 101 34L97 54Q93 62 81 62L32 62Q17 62 16 52Z"/><rect x="28" y="58" width="7" height="30" rx="3.5"/><rect x="42" y="58" width="7" height="30" rx="3.5"/><rect x="72" y="58" width="7" height="30" rx="3.5"/><rect x="85" y="58" width="7" height="30" rx="3.5"/><path d="M16 50Q8 52 6 62" stroke="${col}" stroke-width="4" fill="none" stroke-linecap="round"/></g><circle cx="106" cy="20" r="2.4" fill="#16324F"/><path d="M40 40Q58 30 80 40" stroke="#FFC83D" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
- engine:()=>`<svg viewBox="0 0 120 90" class="engsvg" aria-hidden="true"><rect x="10" y="30" width="80" height="40" rx="10" fill="#FF7A6B"/><rect x="60" y="8" width="34" height="44" rx="8" fill="#FF7A6B"/><rect x="66" y="14" width="22" height="18" rx="4" fill="#BFE6FF"/><rect x="20" y="16" width="14" height="18" rx="3" fill="#16324F"/><path d="M90 60L112 70L90 70Z" fill="#FFC83D"/><circle cx="30" cy="74" r="11" fill="#16324F"/><circle cx="70" cy="74" r="11" fill="#16324F"/><circle cx="30" cy="74" r="4" fill="#FFC83D"/><circle cx="70" cy="74" r="4" fill="#FFC83D"/></svg>`,
+ engine:()=>`<svg viewBox="0 0 120 90" class="engsvg" aria-hidden="true"><rect x="10" y="30" width="80" height="40" rx="10" fill="#F4A99A"/><rect x="60" y="8" width="34" height="44" rx="8" fill="#F4A99A"/><rect x="66" y="14" width="22" height="18" rx="4" fill="#BFE6FF"/><rect x="20" y="16" width="14" height="18" rx="3" fill="#16324F"/><path d="M90 60L112 70L90 70Z" fill="#FFC83D"/><circle cx="30" cy="74" r="11" fill="#16324F"/><circle cx="70" cy="74" r="11" fill="#16324F"/><circle cx="30" cy="74" r="4" fill="#FFC83D"/><circle cx="70" cy="74" r="4" fill="#FFC83D"/></svg>`,
  flag:()=>`<svg viewBox="0 0 30 60" class="flagsvg" aria-hidden="true"><rect x="3" y="2" width="3" height="56" fill="#16324F"/><path d="M6 4H28L22 13L28 22H6Z" fill="#2BA88A"/></svg>`,
 };
-const FISHCOL=["#FF7A6B","#FFC83D","#4C8DF6","#B98CFF","#2BA88A","#FF9F43"];
+const FISHCOL=["#F4A99A","#F3D27E","#8FB8E3","#BFA6EC","#7FC6AE","#F2B98A"];
 const G2=[
- {id:"bubbles",a:"فَقَاعَاتُ الحُرُوف",name:"Bubble Pop",col:"#4C8DF6",art:`<span class="mini bub">ب</span><span class="mini bub s">ت</span>`,sub:"Pop the right bubbles before they fly away!"},
- {id:"fishing",a:"صَيْدُ السَّمَك",name:"Fishing",col:"#2BA88A",art:`<span class="mini fish">${ART.fish("#FFC83D")}</span>`,sub:"Catch the fish that carry the right answer."},
- {id:"race",a:"سِبَاقُ الجِمَال",name:"Camel Race",col:"#FF9F43",art:`<span class="mini cam">${ART.camel("#C98A4B")}</span>`,sub:"Answer fast to win the race to the flag!"},
- {id:"missing",a:"الحَرْفُ النَّاقِص",name:"Missing Letter",col:"#B98CFF",art:`<span class="mini ar">دَ<b>؟</b>ر</span>`,sub:"Which letter is missing from the word?"},
- {id:"match",a:"وَصِّلِ الأَزْوَاج",name:"Match Pairs",col:"#FF7A6B",art:`<span class="mini ar">ب ⟷ بَاء</span>`,sub:"Connect each letter with its partner."},
- {id:"train",a:"قِطَارُ الكَلِمَات",name:"Word Train",col:"#FFC83D",art:`<span class="mini eng">${ART.engine()}</span>`,sub:"Fill the wagons in order and the train drives off!"},
+ {id:"bubbles",a:"فَقَاعَاتُ الحُرُوف",name:"Bubble Pop",col:"#A8C9EB",art:`<span class="mini bub">ب</span><span class="mini bub s">ت</span>`,sub:"Pop the right bubbles before they fly away!"},
+ {id:"fishing",a:"صَيْدُ السَّمَك",name:"Fishing",col:"#9ED3C0",art:`<span class="mini fish">${ART.fish("#FFC83D")}</span>`,sub:"Catch the fish that carry the right answer."},
+ {id:"race",a:"سِبَاقُ الجِمَال",name:"Camel Race",col:"#F6CFA6",art:`<span class="mini cam">${ART.camel("#C98A4B")}</span>`,sub:"Answer fast to win the race to the flag!"},
+ {id:"missing",a:"الحَرْفُ النَّاقِص",name:"Missing Letter",col:"#CDB8F0",art:`<span class="mini ar">دَ<b>؟</b>ر</span>`,sub:"Which letter is missing from the word?"},
+ {id:"match",a:"وَصِّلِ الأَزْوَاج",name:"Match Pairs",col:"#F4B8A9",art:`<span class="mini ar">ب ⟷ بَاء</span>`,sub:"Connect each letter with its partner."},
+ {id:"train",a:"قِطَارُ الكَلِمَات",name:"Word Train",col:"#F8DFA2",art:`<span class="mini eng">${ART.engine()}</span>`,sub:"Fill the wagons in order and the train drives off!"},
 ];
 const G2BY=id=>G2.find(g=>g.id===id);
 const g2Free=id=>["bubbles","fishing","match"].includes(id)||S.member;
