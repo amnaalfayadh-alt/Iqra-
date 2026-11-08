@@ -280,8 +280,8 @@ nav button[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,va
 .dots{display:flex;gap:8px;justify-content:center}.dots span{width:18px;height:18px;border-radius:50%;background:var(--line);transition:background .2s,transform .2s}.dots span.on{background:var(--sun);transform:scale(1.25)}
 .timer{height:10px;background:var(--line);border-radius:999px;overflow:hidden}.timer span{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--coral),var(--sun),var(--leaf));border-radius:999px}
 .stage{position:relative;height:min(58vh,440px);border-radius:26px;overflow:hidden;touch-action:manipulation}
-.stage.bubbles{background:linear-gradient(#8EC9FF,#D7EEFF 70%,#F3FAFF)}
-.stage.fishing{background:linear-gradient(#5CC6E8,#2C8DC4 60%,#1F6E9E)}
+.stage.sk-bubbles{background:linear-gradient(#8EC9FF,#D7EEFF 70%,#F3FAFF)}
+.stage.sk-fishing{background:linear-gradient(#5CC6E8,#2C8DC4 60%,#1F6E9E)}
 .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.85;height:26px}
 .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
 .cloud::before{width:34px;height:34px;top:-16px;left:14px}.cloud::after{width:24px;height:24px;top:-10px;left:42px}
@@ -347,8 +347,8 @@ nav button[aria-current="true"]{background:color-mix(in srgb,var(--sun) 45%,tran
 .dash{background:#FFFFFF}
 .cert{background:linear-gradient(135deg,var(--sun),var(--coral))}
 .tag,.hwi.ok .hwc,.bubbles button.pop{color:var(--ink)}
-.stage.fishing{background:linear-gradient(#CBEAF4,#93C6DF 60%,#78AFCF)}
-.stage.bubbles{background:linear-gradient(#D6E8F8,#EEF5FC 70%,#FFFFFF)}
+.stage.sk-fishing{background:linear-gradient(#CBEAF4,#93C6DF 60%,#78AFCF)}
+.stage.sk-bubbles{background:linear-gradient(#D6E8F8,#EEF5FC 70%,#FFFFFF)}
 .wagon{background:var(--sky)}.wagon.full{background:var(--leaf)}
 .mlines line{stroke:#5FA48F}
 .ring .rfg{stroke:#5FA48F}
@@ -406,6 +406,63 @@ nav button[aria-current="true"]{background:color-mix(in srgb,var(--sun) 45%,tran
  .pill{padding:2px 7px;font-size:.85rem}
  .who{max-width:104px;padding:2px 9px 2px 4px;font-size:.92rem}
 }
+/* game layout: fill the visible area exactly, target on top, answers fill the rest */
+main.gm{position:relative;overflow:hidden;padding-block:6px 6px}
+main.gm #view{height:var(--gh);gap:6px;max-width:760px}
+main.gm #view>*{flex:none}
+main.gm #bk{position:absolute;top:4px;left:max(10px,env(safe-area-inset-left,0px));z-index:6;padding:4px 8px;line-height:1;background:rgba(255,255,255,.85);border-radius:999px}
+main.gm #bk .bi{flex-direction:row;gap:4px}main.gm #bk .bi small{display:none}main.gm #bk .bi .ar{font-size:1rem;line-height:1.4}
+main.gm .bi.h small,main.gm .g2top .bi small,main.gm .ask .bi small,main.gm .focus>.bi:not(.h):not(.findme .bi) small{display:none}
+main.gm .bi.h .ar,main.gm .g2top .bi .ar{font-size:1.25rem;line-height:1.5}
+main.gm .g2top{min-height:32px;padding-left:70px}
+main.gm .focus{flex:1 1 0!important;min-height:0;padding:6px 10px 8px;gap:4px;box-shadow:none;border-width:2px;justify-content:flex-start;overflow:hidden}
+main.gm .focus>.bi.h{margin-top:2px}
+main.gm .meter{font-size:.95rem;line-height:1.3}
+main.gm .lvl.ar{font-size:.85rem;line-height:1.4}
+main.gm .bar{height:6px;margin-top:0;flex:none;width:100%}
+main.gm .ask .ar,main.gm .focus>.bi:not(.h) .ar{font-size:1.1rem;line-height:1.5}
+main.gm .chips.tabs{flex:none;padding-bottom:0}main.gm .chip.sm{padding:2px 10px}main.gm .chip.sm .ar{font-size:1.05rem;line-height:1.5}
+main.gm .findme .ar{font-size:min(3.4rem,calc(var(--gh) * .075));line-height:1.45}main.gm .findme small{font-size:.8rem}
+main.gm .focus .big{font-size:min(7rem,calc(var(--gh) * .13));line-height:1.3;flex:none}
+main.gm .focus .big.mid{font-size:min(3.6rem,calc(var(--gh) * .09))}
+main.gm .focus .btn.ghost{padding:4px 14px;flex:none}
+main.gm .choices{flex:1 1 0;min-height:0;max-width:none;width:100%;grid-auto-rows:minmax(0,1fr);align-content:stretch;gap:8px}
+main.gm .choices button{aspect-ratio:auto!important;height:auto;min-height:0;padding:2px 4px;font-size:min(4.5rem,calc(var(--gh) * .085));line-height:1.35;overflow:hidden}
+main.gm .choices.rules button,main.gm .choices.small button{font-size:min(2rem,calc(var(--gh) * .06))}
+main.gm .choices.rules small{font-size:.75rem}
+main.gm .choices .mk{font-size:min(2.4rem,calc(var(--gh) * .065))}
+main.gm .choices.rwords button{font-size:min(2rem,calc(var(--gh) * .06))}
+main.gm .fb{min-height:1.2em;font-size:1rem;line-height:1.2;margin:0;flex:none}
+main.gm .mem{flex:1 1 0;min-height:0;max-width:none;grid-auto-rows:minmax(0,1fr);gap:6px}
+main.gm .mem .card{aspect-ratio:auto;height:auto;min-height:0}
+main.gm .card.arc{font-size:min(2.2rem,calc(var(--gh) * .065))}
+main.gm .bubbles{flex:1 1 0;min-height:0;max-width:none;grid-auto-rows:minmax(0,1fr);align-content:stretch;gap:6px}
+main.gm .bubbles button{aspect-ratio:auto;height:auto;width:auto;min-height:0;border-radius:999px}
+main.gm .ftarget{padding:4px 10px;flex:none}main.gm .ppic{font-size:min(3rem,calc(var(--gh) * .09))!important}main.gm .ptxt .ar{font-size:min(2rem,calc(var(--gh) * .06))}
+main.gm .dots span{width:13px;height:13px}main.gm .timer{height:7px}
+main.gm .stage{flex:1 1 0!important;height:auto;min-height:180px}
+main.gm .track{padding:4px 8px;gap:2px}main.gm .lane{height:min(70px,calc(var(--gh) * .12))}main.gm .racer{width:min(64px,calc(var(--gh) * .12))}main.gm .lname{font-size:.85rem}
+main.gm #rq{flex:1 1 0!important;min-height:0;display:flex;flex-direction:column;gap:6px}
+main.gm #rq .choices{flex:1 1 0}
+main.gm .mpic{font-size:min(6.5rem,calc(var(--gh) * .15))!important;line-height:1.1}
+main.gm .mword{font-size:min(3.6rem,calc(var(--gh) * .085));line-height:1.6;flex:none}
+main.gm .mboard{flex:1 1 0!important;min-height:0;padding:0}
+main.gm .mcol{gap:8px;height:100%}main.gm .mi{flex:1 1 0;min-height:0}
+main.gm .mi .ar{font-size:min(2.2rem,calc(var(--gh) * .045))}main.gm .mi .big3{font-size:min(3.6rem,calc(var(--gh) * .07))}main.gm .mi .em{font-size:min(4rem,calc(var(--gh) * .075))!important}
+main.gm .tbuilt{font-size:min(3.6rem,calc(var(--gh) * .085));line-height:1.4;flex:none}
+main.gm .rails{flex:none;padding:2px 0 8px}
+main.gm .tiles{flex:1 1 0;min-height:0;align-content:center}
+main.gm .tiles .ltile{width:min(76px,calc(var(--gh) * .12));height:min(76px,calc(var(--gh) * .12));font-size:min(2.8rem,calc(var(--gh) * .07))}
+main.gm .mboard{display:grid;grid-template-rows:minmax(0,1fr);align-items:stretch}
+main.gm .mcol{display:flex;flex-direction:column;min-height:0;height:auto}
+main.gm .mi{flex:1 1 0;min-height:0;max-height:140px}
+main.gm .wagon{padding:4px 0 12px}
+main.gm .wagon .ar{aspect-ratio:auto;height:min(56px,calc(var(--gh) * .1));font-size:min(2.4rem,calc(var(--slot) * .62),calc(var(--gh) * .07))}
+main.gm .tbuilt{min-height:1.2em}
+main.gm .tiles{flex:1 1 0;min-height:0;align-content:flex-start;padding-top:6px;overflow:hidden}
+main.gm .tiles .ltile{width:min(70px,calc(var(--gh) * .11));height:min(70px,calc(var(--gh) * .11))}
+main.gm [data-add],main.gm [data-remove]{min-width:min(78px,calc(var(--gh) * .13));height:min(78px,calc(var(--gh) * .13));font-size:min(2.2rem,calc(var(--gh) * .065))!important;font-family:var(--arabic);border-radius:18px}
+main.gm .g2top .meter{margin-left:4px}
 /* spacing fixes: keep last so they win */
 .ltile{display:flex;align-items:center;justify-content:center;line-height:1.3;padding-bottom:12px}
 nav button{gap:6px;padding-block:8px 6px}
@@ -1414,7 +1471,7 @@ function floatGame(skin){
   view.innerHTML=`${g2Head(id)}<div class="ftarget"><span class="lvl ar">${skin==="fishing"?"اصْطَدْ":"افْقَعْ"}</span>${promptHTML(q)}</div>
    <div class="dots">${Array.from({length:NEED},()=>`<span></span>`).join("")}</div>
    <div class="timer"><span id="tbar"></span></div>
-   <div class="stage ${skin}" id="stage">${skin==="fishing"?`<div class="sand"></div><div class="weed w1"></div><div class="weed w2"></div><div class="weed w3"></div>`:`<div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>`}</div>`;
+   <div class="stage sk-${skin}" id="stage">${skin==="fishing"?`<div class="sand"></div><div class="weed w1"></div><div class="weed w2"></div><div class="weed w3"></div>`:`<div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>`}</div>`;
   $("#bk").onclick=()=>{alive=false;play()};
   const st=$("#stage"),W=()=>st.clientWidth||360,H=()=>st.clientHeight||400;
   function spawn(){
@@ -1545,6 +1602,17 @@ function trainGame(round,score){
       if(pos===ls.length){star();$("#tbuilt").textContent=w.t;$("#why").textContent=T.good+" "+w.t;$("#tr").classList.add("go");setTimeout(()=>trainGame(round+1,score+1),1700)}}
     else{b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400)}});
 }
+
+
+/* ================= GAME LAYOUT: every game fits exactly in the visible area ================= */
+function fitGame(){
+  const main=document.querySelector("main"),bk=document.querySelector("#bk");
+  const isGame=!!bk&&/Games/.test(bk.textContent)&&!!view.querySelector(".choices,.stage,.track,.mboard,.rails,.mem,.bubbles,[data-add]")&&!view.querySelector(".gate");
+  main.classList.toggle("gm",isGame);
+  if(isGame){const cs=getComputedStyle(main);view.style.setProperty("--gh",(main.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom))+"px");main.scrollTop=0}
+}
+new MutationObserver(()=>fitGame()).observe(view,{childList:true});
+addEventListener("resize",fitGame);
 
 /* ================= CHILDREN ================= */
 function kids(){
