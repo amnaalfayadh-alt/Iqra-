@@ -363,6 +363,20 @@ nav button[aria-current="true"]{background:color-mix(in srgb,var(--sun) 45%,tran
 .scard.next{border-color:var(--sun);box-shadow:0 0 0 4px color-mix(in srgb,var(--sun) 45%,transparent)}
 .sok{position:absolute;top:8px;inset-inline-end:10px;color:#4E9A83;font-weight:800}
 .ayah{font-size:1.9rem;line-height:2.3}
+/* shared game styles (pictures, letter tiles, word buttons, read-aloud box) */
+.em{font-size:2.6rem;line-height:1.2;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.em.huge{font-size:5rem}
+.sent{background:color-mix(in srgb,var(--sun) 25%,var(--surface));border-radius:18px;padding:10px 16px;font-size:2rem;line-height:1.8;text-align:center}
+.choices.rwords button{aspect-ratio:auto;padding:14px 6px;font-size:2.2rem;line-height:1.5}
+.tiles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.ltile{width:64px;height:64px;border-radius:18px;background:var(--tint);border:3px solid var(--line);font-size:2.2rem}
+.ltile.good{border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 22%,var(--surface));opacity:.55}
+.ltile.bad{border-color:var(--coral);animation:shake .3s}
+.mpic{font-size:6.5rem!important;line-height:1.15;display:block;text-align:center}
+.mword .gap{display:inline-block;line-height:1.25;vertical-align:middle;padding:0 8px 6px}
+.ppic{font-size:4.2rem!important}
+.mi .em{font-size:3rem!important}
+.mi{min-height:84px}
 /* spacing fixes: keep last so they win */
 .ltile{display:flex;align-items:center;justify-content:center;line-height:1.3;padding-bottom:12px}
 nav button{gap:6px;padding-block:8px 6px}
@@ -1446,7 +1460,7 @@ function missingGame(round,score){
   const opts=shuffle([ans,...wrong]);
   const shown=ls.map((c,i)=>i===k?`<b class="gap">؟</b>`:c).join("");
   view.innerHTML=`${g2Head("missing",`<span class="meter ar">★ ${AN(score)}</span>`)}<span class="lvl ar">${AN(round+1)} مِنْ ${AN(N)}</span><div class="bar"><span style="width:${round/N*100}%"></span></div>
-  <div class="focus"><span class="em huge">${w.e}</span><div class="mword ar" id="mw">${shown}</div>${bi("أَيُّ حَرْفٍ نَاقِص؟","Which letter is missing?")}
+  <div class="focus"><span class="em huge mpic">${w.e}</span><div class="mword ar" id="mw">${shown}</div>${bi("أَيُّ حَرْفٍ نَاقِص؟","Which letter is missing?")}
   <div class="choices">${opts.map(o=>`<button ${o===ans?"data-ok=1":""}><span class="ar">${o}</span></button>`).join("")}</div><p class="note ar fb" id="why"></p></div>`;
   $("#bk").onclick=play;let miss=false;
   view.querySelectorAll(".choices button").forEach(b=>b.onclick=()=>{
@@ -1489,7 +1503,7 @@ function trainGame(round,score){
   const tiles=shuffle([...ls.map((c,k)=>({c,k})),...extra.map(c=>({c,k:-1}))]);let pos=0;
   window.spellHint=()=>[...view.querySelectorAll(".ltile")].find(b=>!b.disabled&&b.textContent===ls[pos]);
   view.innerHTML=`${g2Head("train",`<span class="meter ar">${AN(round+1)} مِنْ ${AN(N)}</span>`)}
-  <div class="focus"><span class="em huge">${w.e}</span>${bi("امْلَأِ العَرَبَات بِالتَّرْتِيب","Fill the wagons in order")}
+  <div class="focus"><span class="em huge mpic">${w.e}</span>${bi("امْلَأِ العَرَبَات بِالتَّرْتِيب","Fill the wagons in order")}
    <div class="rails"><div class="train" id="tr"><div class="eng">${ART.engine()}</div>${ls.map((c,k)=>`<div class="wagon" data-k="${k}"><span class="ar"></span><i></i><i></i></div>`).reverse().join("")}</div></div>
    <div class="tiles">${tiles.map((t,j)=>`<button class="ltile ar" data-t="${j}">${t.c}</button>`).join("")}</div>
    <p class="note ar fb" id="why"></p></div>`;
